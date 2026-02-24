@@ -1,0 +1,549 @@
+/* ============================================================
+   BABAK KHALILI — Portfolio Stylesheet
+   1. CSS Variables
+   2. Reset & Base
+   3. Typography
+   4. Layout
+   5. Navigation
+   6. Pages & Sections
+   7. About
+   8. Projects
+   9. Blog
+   10. Contact
+   11. Sidebar
+   12. Home / Scratch Canvas
+   13. Utilities
+   14. Mobile (≤ 900px)
+   ============================================================ */
+
+/* ── 1. CSS Variables ── */
+:root {
+  --bg: #000;
+  --text: #fff;
+  --text-inverse: #000;
+  --text-dim: #666;
+  --text-body: #eee;
+  --border: #333;
+  --hover-bg: #fff;
+
+  --page-margin: 4rem;
+  --nav-width: clamp(90px, 5vw, 150px);
+  --col-gap: clamp(1.25rem, 3vw, 3.125rem);
+}
+
+/* ── 2. Reset & Base ── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 16px;
+}
+
+body {
+  padding: var(--page-margin);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.navbar button,
+.p-title {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.navbar button.active,
+.navbar button:hover,
+.p-title.active,
+.p-title:hover {
+  background: var(--hover-bg);
+  color: var(--text-inverse);
+  font-weight: 700;
+}
+
+/* ── 3. Typography ── */
+.txt-h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 2.5rem;
+}
+
+.txt-h2,
+.txt-h3 {
+  font-size: clamp(1rem, 4vw, 1.4rem);
+  font-weight: 400;
+  padding: 0.25rem 0.5rem;
+  display: inline-block;
+  transition:
+    background 0.2s,
+    color 0.2s;
+  white-space: nowrap;
+}
+
+.txt-sub {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.txt-body {
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--text-body);
+}
+
+.txt-nav {
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.txt-tiny {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* ── 4. Layout ── */
+.main-layout {
+  display: grid;
+  grid-template-columns: var(--nav-width) 1.5fr 1.5fr;
+  gap: var(--col-gap);
+  align-items: start;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 5;
+}
+
+.main-layout.projects-active {
+  grid-template-columns: var(--nav-width) minmax(260px, 1fr) minmax(0, 1.5fr);
+}
+
+/* ── 5. Navigation ── */
+.navbar {
+  position: sticky;
+  top: 0;
+  height: 100%;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.navbar ul {
+  list-style: none;
+}
+
+.navbar li {
+  margin-bottom: 0.6rem;
+}
+
+.navbar a {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  color: var(--text);
+  transition:
+    background 0.2s,
+    color 0.2s;
+  cursor: pointer;
+}
+
+.navbar a.active,
+.navbar a:hover {
+  background: var(--hover-bg);
+  color: var(--text-inverse);
+  font-weight: 700;
+}
+
+/* ── 6. Pages ── */
+.content-center {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  min-width: 0;
+}
+
+.page {
+  display: none;
+  width: 100%;
+}
+
+.page.active {
+  display: block;
+}
+
+/* ── 7. About ── */
+.bio-paragraph p {
+  margin-bottom: 1.5rem;
+  text-align: justify;
+}
+
+.cv-wrapper {
+  margin-top: 4rem;
+}
+
+.cv-section {
+  margin-bottom: 3rem;
+}
+
+/* ── 8. Projects ── */
+.project-list {
+  list-style: none;
+}
+
+.project-list li {
+  margin-bottom: 0.6rem;
+}
+
+.p-title {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  color: var(--text);
+  transition:
+    background 0.2s,
+    color 0.2s;
+  cursor: pointer;
+}
+
+.p-title.active,
+.p-title:hover {
+  background: var(--hover-bg);
+  color: var(--text-inverse);
+  font-weight: 700;
+}
+
+.page#projects.project-open .project-list {
+  display: none;
+}
+
+.project-detail-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.project-back {
+  align-self: flex-start;
+  display: inline-block;
+  padding: 0.0625rem 0.1875rem;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.project-back:hover,
+.project-back:focus-visible {
+  background: var(--hover-bg);
+  color: var(--text-inverse);
+  font-weight: 700;
+}
+
+.project-detail-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.05;
+}
+
+.project-detail-description {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text-body);
+}
+
+.project-detail-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.p-block.p-text p {
+  font-size: 0.8125rem;
+  line-height: 1.8;
+  color: var(--text-body);
+  text-align: justify;
+}
+
+.p-block.p-media img,
+.p-block.p-media video {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.p-media-caption {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 0.5rem;
+}
+
+/* ── 9. Reflection ── */
+.reflection-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.reflection-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.reflection-title:hover {
+  text-decoration: underline;
+}
+
+/* ── 10. Contact ── */
+.contact-links p {
+  margin-bottom: 0.75rem;
+}
+
+.contact-links a:hover {
+  text-decoration: underline;
+}
+
+/* ── 11. Sidebar ── */
+.content-right {
+  height: 100%;
+  overflow-y: auto;
+  width: 100%;
+  z-index: 10;
+  min-width: 0;
+}
+
+.side-asset {
+  display: none;
+}
+
+#about-img {
+  justify-content: center;
+  align-items: flex-start;
+}
+
+#about-img.visible {
+  display: flex;
+}
+
+#about-img img {
+  width: 100%;
+  max-width: 31.25rem;
+  height: auto;
+  margin: 0 auto;
+}
+
+#project-details.visible {
+  display: block;
+}
+
+.side-asset:not(#about-img) img,
+.side-asset video {
+  width: 100%;
+  max-width: 50rem;
+  height: auto;
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+/* ── 12. Home / Scratch Canvas ── */
+#scratch-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.reveal-text {
+  font-size: clamp(2.5rem, 8vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: 0.3125rem;
+  text-align: center;
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+#scratch-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+/* ── 13. Utilities ── */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+/* ── 14. Small Desktop / Tablet (901px-1500px) ── */
+@media (max-width: 1500px) and (min-width: 901px) {
+  :root {
+    --col-gap: clamp(0.75rem, 1.8vw, 1.5rem);
+  }
+
+  .main-layout.projects-active {
+    grid-template-columns: var(--nav-width) minmax(260px, 1.12fr) minmax(
+        0,
+        1.28fr
+      );
+  }
+
+  .project-list .p-title {
+    font-size: clamp(1.05rem, 1.2vw, 1.28rem);
+    line-height: 1.35;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 901px) {
+  .project-list .p-title {
+    font-size: clamp(0.9rem, 1vw, 1.08rem);
+  }
+}
+
+/* ── 15. Mobile (≤ 900px) ── */
+@media (max-width: 900px) {
+  :root {
+    --page-margin: 1.5rem;
+  }
+
+  html,
+  body {
+    height: auto;
+    overflow: auto;
+  }
+
+  .main-layout,
+  .main-layout.projects-active {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: auto;
+  }
+
+  .navbar {
+    order: 1;
+    height: auto;
+    overflow: visible;
+  }
+  .content-right {
+    order: 2;
+    height: auto;
+    overflow: visible;
+  }
+  main.content-center {
+    order: 3;
+    height: auto;
+    overflow: visible;
+  }
+
+  .navbar {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    padding: 0.625rem 0;
+    z-index: 100;
+  }
+
+  .navbar ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9375rem;
+  }
+
+  .content-right {
+    position: relative;
+    top: 0;
+  }
+
+  .main-layout.projects-active main.content-center {
+    order: 2;
+  }
+
+  .main-layout.projects-active .content-right {
+    order: 3;
+  }
+
+  .main-layout.projects-active {
+    gap: 0.75rem;
+  }
+
+  .main-layout.projects-active .project-detail-shell {
+    gap: 0.3125rem;
+  }
+
+  .main-layout.projects-active .project-back {
+    margin-top: -0.25rem;
+  }
+
+  #about-img.visible {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  #about-img img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+  }
+
+  .txt-h1 {
+    font-size: 2.2rem;
+    margin-top: 0.5rem;
+  }
+
+  .txt-h2,
+  .txt-h3,
+  .p-title {
+    white-space: normal;
+  }
+
+  .project-detail-title {
+    font-size: clamp(1.4rem, 7vw, 2rem);
+  }
+
+  #scratch-container {
+    position: relative;
+    height: 60vh;
+  }
+}

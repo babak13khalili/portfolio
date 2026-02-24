@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Babak Khalili — Multi-disciplinary artist and MADTech student exploring personal data, digital identity, and immersive environments." />
+    <title>Babak Khalili</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap"
+      rel="stylesheet" />
+
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+
+  <body>
+    <div class="main-layout" id="layout-root">
+      <!-- Navigation -->
+      <nav class="navbar" aria-label="Main navigation">
+        <ul>
+          <li>
+            <button
+              class="nav-link active txt-nav"
+              type="button"
+              data-section="home"
+              aria-controls="home">
+              Home
+            </button>
+          </li>
+          <li>
+            <button
+              class="nav-link txt-nav"
+              type="button"
+              data-section="about"
+              aria-controls="about">
+              About
+            </button>
+          </li>
+          <li>
+            <button
+              class="nav-link txt-nav"
+              type="button"
+              data-section="projects"
+              aria-controls="projects">
+              Projects
+            </button>
+          </li>
+          <li>
+            <button
+              class="nav-link txt-nav"
+              type="button"
+              data-section="log"
+              aria-controls="log">
+              Log
+            </button>
+          </li>
+          <li>
+            <button
+              class="nav-link txt-nav"
+              type="button"
+              data-section="contact"
+              aria-controls="contact">
+              Contact
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="content-center" id="main-content">
+        <!-- Home -->
+        <section id="home" class="page active" aria-label="Home">
+          <h1 class="visually-hidden">Website under construction</h1>
+          <div id="scratch-container" role="presentation">
+            <h1 class="reveal-text">WEBSITE UNDER CONSTRUCTION</h1>
+            <canvas id="scratch-canvas"></canvas>
+          </div>
+        </section>
+
+        <!-- About (متن کامل برگشت داده شده) -->
+        <section id="about" class="page" aria-label="About Babak Khalili">
+          <h1 class="txt-h1 about-heading">Babak Khalili</h1>
+
+          <div class="bio-paragraph txt-body">
+            <p>
+              Babak is a multi-disciplinary artist and currently Master's
+              student in the MADTech program at the Frank Mohr Institute in
+              Groningen. With a background in design and motion design from
+              Iran, his practice is rooted in a long-term immersion in digital
+              tools — a process he views as a meditative act of self-observation
+              and imaginative discovery.
+            </p>
+
+            <p>
+              His work functions as a continuous autobiography, a space where
+              self-expression and lived experiences are meticulously
+              deconstructed. By constantly looking back at time and his own
+              history, Babak treats technology not merely as a tool, but as a
+              lens to examine the intricacies of human presence. Central to this
+              exploration is the use of personal data; he views these digital
+              archives as "footprints" — vital traces of personal life
+              information, which he transforms into core artistic materials to
+              represent his unique perspective on everyday life.
+            </p>
+
+            <p>
+              By recreating these lived experiences through data-based artworks
+              and immersive environments, Babak seeks to trigger specific
+              emotional and intellectual responses in his audience. His work
+              serves as an invitation for viewers to reflect on certain
+              narratives and pause within shared human struggles.
+            </p>
+
+            <p>
+              This journey is defined by an intentional loop of "knowing of not
+              knowing." By actively embracing uncertainty and stepping beyond
+              the boundaries of his comfort zone, Babak dives into the unseen
+              and the unproven. He creates experiential spaces where his
+              internal self-reflections meet the viewer's own perspective,
+              fostering a profound moment of recognition and connection within
+              the unknown.
+            </p>
+          </div>
+
+          <div class="cv-wrapper">
+            <div class="cv-section">
+              <h2 class="txt-sub">Education</h2>
+              <p class="txt-body">
+                2027 — Masters of Fine Arts, MADTech, Frank Mohr Institute,
+                Groningen, Netherlands
+              </p>
+              <p class="txt-body">
+                2019 — Bachelor of Visual Communication, University of Science
+                and Culture, Tehran, Iran
+              </p>
+            </div>
+
+            <div class="cv-section">
+              <h2 class="txt-sub">Exhibitions</h2>
+              <p class="txt-body">
+                2025 — Video installation, Club Noord × Kunstkantine group show,
+                Minerva Art Academy, Groningen, Netherlands
+              </p>
+              <p class="txt-body">
+                2025 — Disruption, Interactive solo installation, Rischee29 ×
+                Containeer, Tehran, Iran
+              </p>
+              <p class="txt-body">2025 — OOO Exhibition, Oslo, Norway</p>
+              <p class="txt-body">2023 — OOO Exhibition, Oslo, Norway</p>
+              <p class="txt-body">2022 — Demo Festival, Netherlands</p>
+              <p class="txt-body">
+                2017 — Photography Group Exhibition, No.6 Gallery, Tehran, Iran
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Projects -->
+        <section id="projects" class="page" aria-label="Projects">
+          <ul class="project-list" id="project-titles">
+            <li>
+              <button
+                class="p-title txt-h2"
+                type="button"
+                data-project="Data Shredder">
+                Data Shredder
+              </button>
+            </li>
+            <li>
+              <button class="p-title txt-h2" type="button" data-project="Disruption">
+                Disruption
+              </button>
+            </li>
+            <li>
+              <button
+                class="p-title txt-h2"
+                type="button"
+                data-project="Birthday Projects">
+                Birthday Projects
+              </button>
+            </li>
+            <li>
+              <button
+                class="p-title txt-h2"
+                type="button"
+                data-project="Short Moving Images">
+                Short Moving Images
+              </button>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Log -->
+        <section id="log" class="page" aria-label="Log">
+          <div class="log-container">
+            <article class="log-item">
+              <time class="log-date txt-tiny" datetime="2026-01-01"
+                >Coming soon</time
+              >
+              <span class="log-title txt-h3">— —</span>
+            </article>
+          </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="page" aria-label="Contact">
+          <address class="contact-links txt-body">
+            <p>
+              <a href="mailto:babak313khalili@gmail.com"
+                >babak313khalili@gmail.com</a
+              >
+            </p>
+            <p>
+              <a
+                href="https://instagram.com/babak13khalili"
+                target="_blank"
+                rel="noopener noreferrer"
+                >instagram.com/babak13khalili</a
+              >
+            </p>
+            <p>
+              <a
+                href="https://x.com/babak13khalili"
+                target="_blank"
+                rel="noopener noreferrer"
+                >x.com/babak13khalili</a
+              >
+            </p>
+          </address>
+        </section>
+      </main>
+
+      <!-- Sidebar -->
+      <aside class="content-right" aria-label="Project details">
+        <div id="about-img" class="side-asset">
+          <img
+            src="assets/images/profile.jpg"
+            alt="Portrait of Babak Khalili"
+            loading="lazy" />
+        </div>
+
+        <div
+          id="project-details"
+          class="side-asset scrollable-content"
+          aria-live="polite"></div>
+      </aside>
+    </div>
+
+    <script src="assets/js/script.js"></script>
+  </body>
+</html>
