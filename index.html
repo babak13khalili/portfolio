@@ -6,11 +6,7 @@
     <meta
       name="description"
       content="Babak Khalili — Multi-disciplinary artist and MADTech student exploring personal data, digital identity, and immersive environments." />
-
     <title>Babak Khalili</title>
-
-    <!-- Markdown Parser -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <!-- Font -->
     <link
@@ -103,7 +99,7 @@
           </div>
         </section>
 
-        <!-- Projects — list is populated by script.js from manifest.js -->
+        <!-- Projects — populated by script.js from manifest.js -->
         <section id="projects" class="page">
           <ul class="project-list"></ul>
         </section>
@@ -112,7 +108,7 @@
           <p class="txt-tiny">Coming soon</p>
         </section>
 
-        <!-- Reflections — list is populated by script.js from manifest.js -->
+        <!-- Reflections — populated by script.js from manifest.js -->
         <section id="reflections" class="page">
           <div class="reflection-container"></div>
         </section>
@@ -135,8 +131,11 @@
 
     </div>
 
-    <!-- type="module" enables ES import in manifest.js -->
+    <!-- 1. Markdown parser -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script type="module" src="assets/js/script.js"></script>
+    <!-- 2. Content manifest (sets window.SITE_MANIFEST) — MUST come before script.js -->
+    <script src="content/manifest.js"></script>
+    <!-- 3. Main app -->
+    <script src="assets/js/script.js"></script>
   </body>
 </html>

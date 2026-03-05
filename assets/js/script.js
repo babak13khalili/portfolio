@@ -1,16 +1,60 @@
 // ============================================================
 //  BABAK KHALILI — Main Script
-//  Reads from content/manifest.js and builds the UI dynamically.
-//  To add content, edit content/manifest.js only.
+//  Content is driven by content/manifest.js (window.SITE_MANIFEST).
+//  To add content, only edit that file + add a .md file.
 // ============================================================
 
-import { reflections, projects } from "../../content/manifest.js";
+// ── Scratch Canvas ───────────────────────────────────────────
+(function initScratch() {
+  const canvas = document.getElementById("scratch-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  let painting = false;
 
-// ── Scratch Canvas ──────────────────────────────────────────
-// (keep your existing scratch canvas code here, untouched)
-// ── End Scratch Canvas ─────────────────────────────────────
+  function resize() {
+    const container = canvas.parentElement;
+    canvas.width  = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
 
-document.addEventListener("DOMContentLoaded", () => {
+  function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - r.left, y: src.clientY - r.top };
+  }
+
+  function scratch(e) {
+    if (!painting) return;
+    e.preventDefault();
+    const { x, y } = getPos(e);
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.beginPath();
+    ctx.arc(x, y, 32, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  canvas.addEventListener("mousedown",  (e) => { painting = true; scratch(e); });
+  canvas.addEventListener("mousemove",  scratch);
+  canvas.addEventListener("mouseup",   () => { painting = false; });
+  canvas.addEventListener("mouseleave",() => { painting = false; });
+  canvas.addEventListener("touchstart", (e) => { painting = true; scratch(e); }, { passive: false });
+  canvas.addEventListener("touchmove",  scratch, { passive: false });
+  canvas.addEventListener("touchend",  () => { painting = false; });
+
+  window.addEventListener("resize", resize);
+  resize();
+})();
+
+// ── Main App ─────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", function () {
+
+  // Pull content from manifest (loaded before this script in HTML)
+  const manifest     = window.SITE_MANIFEST || { reflections: [], projects: [] };
+  const reflections  = manifest.reflections;
+  const projects     = manifest.projects;
+
   const layoutRoot     = document.getElementById("layout-root");
   const navLinks       = document.querySelectorAll(".nav-link");
   const pages          = document.querySelectorAll(".page");
@@ -18,53 +62,49 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectDetails = document.getElementById("project-details");
 
   const state = {
-    activeSection:   "home",
-    activeProject:   null,
+    activeSection:    "home",
+    activeProject:    null,
     activeReflection: null,
   };
 
-  // ── Build lists from manifest ─────────────────────────────
+  // ── Build lists from manifest ───────────────────────────────
 
-  const reflectionContainer = document.querySelector(".reflection-container");
+  var reflectionContainer = document.querySelector(".reflection-container");
   if (reflectionContainer) {
-    reflectionContainer.innerHTML = reflections
-      .map(
-        (r) => `
-        <article class="reflection-item">
-          <time class="txt-tiny">${r.displayDate}</time>
-          <button
-            class="reflection-title txt-h3"
-            data-id="${r.id}"
-            data-file="${r.file}"
-            data-title="${r.title}"
-            data-date="${r.displayDate}"
-            data-meta="${r.meta ?? ""}">
-            ${r.title}
-          </button>
-        </article>`
-      )
-      .join("");
+    reflectionContainer.innerHTML = reflections.map(function (r) {
+      return (
+        '<article class="reflection-item">' +
+          '<time class="txt-tiny">' + r.displayDate + '</time>' +
+          '<button class="reflection-title txt-h3"' +
+            ' data-id="'    + r.id          + '"' +
+            ' data-file="'  + r.file        + '"' +
+            ' data-title="' + r.title       + '"' +
+            ' data-date="'  + r.displayDate + '"' +
+            ' data-meta="'  + (r.meta || '') + '">' +
+            r.title +
+          '</button>' +
+        '</article>'
+      );
+    }).join("");
   }
 
-  const projectList = document.querySelector(".project-list");
+  var projectList = document.querySelector(".project-list");
   if (projectList) {
-    projectList.innerHTML = projects
-      .map(
-        (p) => `
-        <li>
-          <button
-            class="p-title txt-h2"
-            data-id="${p.id}"
-            data-file="${p.file}"
-            data-title="${p.title}">
-            ${p.title}
-          </button>
-        </li>`
-      )
-      .join("");
+    projectList.innerHTML = projects.map(function (p) {
+      return (
+        '<li>' +
+          '<button class="p-title txt-h2"' +
+            ' data-id="'    + p.id    + '"' +
+            ' data-file="'  + p.file  + '"' +
+            ' data-title="' + p.title + '">' +
+            p.title +
+          '</button>' +
+        '</li>'
+      );
+    }).join("");
   }
 
-  // ── State & render ────────────────────────────────────────
+  // ── State & render ──────────────────────────────────────────
 
   function setState(patch) {
     Object.assign(state, patch);
@@ -72,24 +112,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function render() {
-    pages.forEach((page) => {
+    pages.forEach(function (page) {
       page.classList.toggle("active", page.id === state.activeSection);
     });
-    navLinks.forEach((btn) => {
-      btn.classList.toggle(
-        "active",
-        btn.dataset.section === state.activeSection
-      );
+    navLinks.forEach(function (btn) {
+      btn.classList.toggle("active", btn.dataset.section === state.activeSection);
     });
     if (aboutImg) {
       aboutImg.classList.toggle("visible", state.activeSection === "about");
     }
   }
 
-  // ── Navigation ────────────────────────────────────────────
+  // ── Navigation ──────────────────────────────────────────────
 
-  navLinks.forEach((btn) => {
-    btn.addEventListener("click", () => {
+  navLinks.forEach(function (btn) {
+    btn.addEventListener("click", function () {
       closeDetail();
       setState({
         activeSection:    btn.dataset.section,
@@ -99,75 +136,70 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ── Open detail (shared by projects + reflections) ────────
+  // ── Open detail (projects + reflections) ────────────────────
 
-  async function openDetail({ file, title, date, meta, type, sidebarMedia = [] }) {
+  function openDetail(opts) {
     if (!projectDetails) return;
 
-    // Show loading state
-    projectDetails.innerHTML = `<p class="txt-tiny">Loading…</p>`;
+    projectDetails.innerHTML = '<p class="txt-tiny">Loading…</p>';
     projectDetails.classList.add("visible");
 
-    let markdown;
-    try {
-      const res = await fetch(file);
-      if (!res.ok) throw new Error(res.statusText);
-      markdown = await res.text();
-    } catch {
-      projectDetails.innerHTML = `<p class="txt-tiny">Could not load "${file}".</p>`;
-      return;
-    }
+    fetch(opts.file)
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.statusText);
+        return res.text();
+      })
+      .then(function (markdown) {
+        var html = marked.parse(markdown, { breaks: true, gfm: true });
+        var backSection = opts.type === "project" ? "projects" : "reflections";
+        var bodyClass   = opts.type === "reflection" ? "reflection-body" : "project-detail-description";
 
-    marked.setOptions({ breaks: true, gfm: true });
-    const html = marked.parse(markdown);
+        var mediaHtml = "";
+        if (opts.sidebarMedia && opts.sidebarMedia.length) {
+          mediaHtml = opts.sidebarMedia.map(function (m) {
+            return (
+              '<figure class="p-block p-media">' +
+                '<img src="' + m.src + '" alt="' + (m.alt || '') + '">' +
+                (m.caption ? '<figcaption class="p-media-caption">' + m.caption + '</figcaption>' : '') +
+              '</figure>'
+            );
+          }).join("");
+        }
 
-    const backSection = type === "project" ? "projects" : "reflections";
-    const bodyClass   = type === "reflection" ? "reflection-body" : "project-detail-description";
+        projectDetails.innerHTML =
+          '<div class="project-detail-shell">' +
+            '<button class="project-back txt-tiny" data-back="' + backSection + '">← Back</button>' +
+            '<div class="project-detail-layout">' +
+              (opts.date ? '<p class="txt-tiny">' + opts.date + '</p>' : '') +
+              '<h1 class="project-detail-title">' + opts.title + '</h1>' +
+              '<div class="' + bodyClass + '">' + html + '</div>' +
+              (opts.meta ? '<p class="txt-tiny">' + opts.meta + '</p>' : '') +
+            '</div>' +
+          '</div>' +
+          mediaHtml;
 
-    projectDetails.innerHTML = `
-      <div class="project-detail-shell">
-        <button class="project-back txt-tiny" data-back="${backSection}">← Back</button>
-        <div class="project-detail-layout">
-          ${date ? `<p class="txt-tiny">${date}</p>` : ""}
-          <h1 class="project-detail-title">${title}</h1>
-          <div class="${bodyClass}">${html}</div>
-          ${meta ? `<p class="txt-tiny">${meta}</p>` : ""}
-        </div>
-      </div>
-    `;
+        // Back button
+        var backBtn = projectDetails.querySelector(".project-back");
+        if (backBtn) {
+          backBtn.addEventListener("click", function () {
+            var section = backBtn.dataset.back;
+            closeDetail();
+            setState({ activeSection: section, activeProject: null, activeReflection: null });
+          });
+        }
 
-    // Sidebar media for projects
-    if (sidebarMedia.length) {
-      projectDetails.innerHTML += sidebarMedia
-        .map(
-          (m) => `
-          <figure class="p-block p-media">
-            <img src="${m.src}" alt="${m.alt ?? ""}">
-            ${m.caption ? `<figcaption class="p-media-caption">${m.caption}</figcaption>` : ""}
-          </figure>`
-        )
-        .join("");
-    }
-
-    // Back button handler
-    projectDetails
-      .querySelector(".project-back")
-      ?.addEventListener("click", (e) => {
-        const section = e.currentTarget.dataset.back;
-        closeDetail();
-        setState({
-          activeSection:    section,
-          activeProject:    null,
-          activeReflection: null,
-        });
+        if (opts.type === "project") {
+          if (layoutRoot) layoutRoot.classList.add("projects-active");
+          var pSection = document.getElementById("projects");
+          if (pSection) pSection.classList.add("project-open");
+        } else {
+          var rSection = document.getElementById("reflections");
+          if (rSection) rSection.classList.add("reflection-open");
+        }
+      })
+      .catch(function () {
+        projectDetails.innerHTML = '<p class="txt-tiny">Could not load "' + opts.file + '".</p>';
       });
-
-    if (type === "project") {
-      layoutRoot?.classList.add("projects-active");
-      document.getElementById("projects")?.classList.add("project-open");
-    } else {
-      document.getElementById("reflections")?.classList.add("reflection-open");
-    }
   }
 
   function closeDetail() {
@@ -175,45 +207,46 @@ document.addEventListener("DOMContentLoaded", () => {
       projectDetails.innerHTML = "";
       projectDetails.classList.remove("visible");
     }
-    layoutRoot?.classList.remove("projects-active");
-    document.getElementById("projects")?.classList.remove("project-open");
-    document.getElementById("reflections")?.classList.remove("reflection-open");
+    if (layoutRoot) layoutRoot.classList.remove("projects-active");
+    var pSection = document.getElementById("projects");
+    if (pSection) pSection.classList.remove("project-open");
+    var rSection = document.getElementById("reflections");
+    if (rSection) rSection.classList.remove("reflection-open");
   }
 
-  // ── Projects (delegated click) ────────────────────────────
+  // ── Project clicks (delegated) ───────────────────────────────
 
-  document.querySelector(".project-list")?.addEventListener("click", (e) => {
-    const btn = e.target.closest(".p-title");
-    if (!btn) return;
-
-    const project = projects.find((p) => p.id === btn.dataset.id);
-
-    openDetail({
-      file:         btn.dataset.file,
-      title:        btn.dataset.title,
-      type:         "project",
-      sidebarMedia: project?.sidebarMedia ?? [],
+  if (projectList) {
+    projectList.addEventListener("click", function (e) {
+      var btn = e.target.closest(".p-title");
+      if (!btn) return;
+      var project = projects.find(function (p) { return p.id === btn.dataset.id; });
+      openDetail({
+        file:         btn.dataset.file,
+        title:        btn.dataset.title,
+        type:         "project",
+        sidebarMedia: project ? project.sidebarMedia : [],
+      });
+      setState({ activeSection: "projects", activeProject: btn.dataset.id });
     });
+  }
 
-    setState({ activeSection: "projects", activeProject: btn.dataset.id });
-  });
+  // ── Reflection clicks (delegated) ───────────────────────────
 
-  // ── Reflections (delegated click) ────────────────────────
-
-  document.querySelector(".reflection-container")?.addEventListener("click", (e) => {
-    const btn = e.target.closest(".reflection-title");
-    if (!btn) return;
-
-    openDetail({
-      file:  btn.dataset.file,
-      title: btn.dataset.title,
-      date:  btn.dataset.date,
-      meta:  btn.dataset.meta,
-      type:  "reflection",
+  if (reflectionContainer) {
+    reflectionContainer.addEventListener("click", function (e) {
+      var btn = e.target.closest(".reflection-title");
+      if (!btn) return;
+      openDetail({
+        file:  btn.dataset.file,
+        title: btn.dataset.title,
+        date:  btn.dataset.date,
+        meta:  btn.dataset.meta,
+        type:  "reflection",
+      });
+      setState({ activeSection: "reflections", activeReflection: btn.dataset.id });
     });
-
-    setState({ activeSection: "reflections", activeReflection: btn.dataset.id });
-  });
+  }
 
   render();
 });
