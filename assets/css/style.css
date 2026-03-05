@@ -27,7 +27,7 @@
   --hover-bg: #fff;
 
   --page-margin: 4rem;
-  --nav-width: clamp(90px, 5vw, 150px);
+  --nav-width: clamp(7rem, 9vw, 12rem);
   --col-gap: clamp(1.25rem, 3vw, 3.125rem);
 }
 
@@ -68,7 +68,8 @@ button {
 }
 
 .navbar button,
-.p-title {
+.p-title,
+.reflection-title {
   display: inline-block;
   padding: 0.125rem 0.375rem;
   transition:
@@ -79,7 +80,10 @@ button {
 .navbar button.active,
 .navbar button:hover,
 .p-title.active,
-.p-title:hover {
+.p-title:hover,
+.reflection-title.active,
+.reflection-title:hover,
+.reflection-title:focus-visible {
   background: var(--hover-bg);
   color: var(--text-inverse);
   font-weight: 700;
@@ -242,6 +246,10 @@ button {
   display: none;
 }
 
+.page#reflections.reflection-open .reflection-container {
+  display: none;
+}
+
 .project-detail-shell {
   display: flex;
   flex-direction: column;
@@ -284,8 +292,8 @@ button {
 }
 
 .p-block.p-text p {
-  font-size: 0.8125rem;
-  line-height: 1.8;
+  font-size: 0.8rem;
+  line-height: 1.4;
   color: var(--text-body);
   text-align: justify;
 }
@@ -317,8 +325,12 @@ button {
   gap: 0.25rem;
 }
 
-.reflection-title:hover {
-  text-decoration: underline;
+.reflection-title {
+  align-self: flex-start;
+}
+
+.reflection-body p {
+  margin-bottom: 0.75rem;
 }
 
 /* ── 10. Contact ── */
@@ -412,6 +424,73 @@ button {
   height: 1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
+}
+
+.reflection-body {
+  max-width: 42rem;
+}
+
+.reflection-body h1 {
+  font-size: 1.8rem;
+  margin: 2rem 0 1rem 0;
+  font-weight: 700;
+}
+
+.reflection-body h2 {
+  font-size: 1.3rem;
+  margin: 1.8rem 0 0.8rem 0;
+  font-weight: 700;
+}
+
+.reflection-body h3 {
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0.6rem 0;
+  font-weight: 700;
+}
+
+.reflection-body p {
+  margin-bottom: 1rem;
+  line-height: 1.8;
+  color: var(--text-body);
+}
+
+.reflection-body strong {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.reflection-body em {
+  font-style: italic;
+}
+
+.reflection-body ul,
+.reflection-body ol {
+  margin: 1rem 0 1rem 1.2rem;
+}
+
+.reflection-body li {
+  margin-bottom: 0.4rem;
+}
+
+.reflection-body hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+  opacity: 0.4;
+}
+
+.reflection-body blockquote {
+  border-left: 2px solid var(--text);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: var(--text-dim);
+}
+
+.reflection-body code {
+  background: #111;
+  padding: 0.1rem 0.3rem;
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
 }
 
 /* ── 14. Small Desktop / Tablet (901px-1500px) ── */
@@ -534,7 +613,8 @@ button {
 
   .txt-h2,
   .txt-h3,
-  .p-title {
+  .p-title,
+  .reflection-title {
     white-space: normal;
   }
 
