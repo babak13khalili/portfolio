@@ -1,7 +1,5 @@
-**31 December 2025 – Wednesday – 13:33**  
-  
-**Wandering in Time**  
-  
+**Wednesday – 13:33**  
+
 Last year, in these very moments and days, I could not form any clear image in my mind of where I would be at this exact time the following year.  
 I had stepped onto a path filled with excitement, motivation, hope, fear, ambiguity, and an uneven mixture of many other emotions.  
   
@@ -121,6 +119,6 @@ I am homesick and alone.
 A deep, inner loneliness.  
 Homesick for myself, and for the moments that passed—spent anxiously rushing toward the future without recognizing their true quality.  
  
-**31 December 2025**
+
 **14:18**  
 **McDonald’s, Atomweg, Groningen – the last day of 2025**
