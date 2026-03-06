@@ -4,15 +4,11 @@
 //  To add content, only edit that file + add a .md file.
 // ============================================================
 
-// ── Cursor FX (desktop pointer only) ────────────────────────
+// ── Cursor FX ────────────────────────────────────────────────
 (function initCursorFX() {
-  var supportsFinePointer = window.matchMedia(
-    "(hover: hover) and (pointer: fine)",
-  ).matches;
-  if (!supportsFinePointer) return;
-
   var cursor = document.getElementById("cursor-square");
   if (!cursor) return;
+  document.documentElement.classList.add("cursor-fx-enabled");
 
   var idleTimer = null;
   var rafId = null;
@@ -196,21 +192,32 @@
     rafId = requestAnimationFrame(renderGlitch);
   }
 
-  document.addEventListener(
-    "mousemove",
-    function (e) {
-      pointerX = e.clientX;
-      pointerY = e.clientY;
-      cursor.style.transform =
-        "translate(" + (pointerX - 4) + "px," + (pointerY - 4) + "px)";
-      queueRender();
-      if (idleTimer) clearTimeout(idleTimer);
-      idleTimer = setTimeout(setIdle, 95);
-    },
-    { passive: true },
-  );
+  function updatePointer(x, y) {
+    pointerX = x;
+    pointerY = y;
+    cursor.style.transform =
+      "translate(" + (pointerX - 4) + "px," + (pointerY - 4) + "px)";
+    queueRender();
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(setIdle, 95);
+  }
+
+  document.addEventListener("pointermove", function (e) {
+    updatePointer(e.clientX, e.clientY);
+  });
+
+  document.addEventListener("pointerdown", function (e) {
+    updatePointer(e.clientX, e.clientY);
+  });
+
+  document.addEventListener("touchmove", function (e) {
+    if (!e.touches || !e.touches.length) return;
+    updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+  });
 
   document.addEventListener("mouseleave", setIdle);
+  document.addEventListener("pointerup", setIdle);
+  document.addEventListener("pointercancel", setIdle);
   document.addEventListener("content:changed", collectTargets);
   collectTargets();
 })();
@@ -232,6 +239,8 @@ document.addEventListener("DOMContentLoaded", function () {
     activeProject: null,
     activeReflection: null,
   };
+
+  var markdownCache = Object.create(null);
 
   // ── Build lists from manifest ───────────────────────────────
 
@@ -380,17 +389,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ── Open detail (projects + reflections) ────────────────────
 
+  function fetchMarkdown(file) {
+    var cached = markdownCache[file];
+    if (typeof cached === "string") return Promise.resolve(cached);
+    if (cached && typeof cached.then === "function") return cached;
+
+    var request = fetch(file).then(function (res) {
+      if (!res.ok) throw new Error(res.statusText);
+      return res.text();
+    });
+
+    markdownCache[file] = request
+      .then(function (text) {
+        markdownCache[file] = text;
+        return text;
+      })
+      .catch(function (err) {
+        delete markdownCache[file];
+        throw err;
+      });
+
+    return markdownCache[file];
+  }
+
+  function warmMarkdownCache() {
+    var files = reflections
+      .concat(projects)
+      .map(function (item) {
+        return item.file;
+      })
+      .filter(Boolean)
+      .filter(function (file, index, list) {
+        return list.indexOf(file) === index;
+      });
+
+    files.forEach(function (file, index) {
+      var delay = index * 120;
+      setTimeout(function () {
+        fetchMarkdown(file).catch(function () {
+          // keep UI responsive even if a preload fails
+        });
+      }, delay);
+    });
+  }
+
   function openDetail(opts) {
     if (!projectDetails) return;
 
     projectDetails.innerHTML = '<p class="txt-tiny">Loading…</p>';
     projectDetails.classList.add("visible");
 
-    fetch(opts.file)
-      .then(function (res) {
-        if (!res.ok) throw new Error(res.statusText);
-        return res.text();
-      })
+    fetchMarkdown(opts.file)
       .then(function (markdown) {
         markdown = stripDuplicateTopHeading(markdown, opts.title);
         var html = marked.parse(markdown, { breaks: true, gfm: true });
@@ -550,5 +599,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.dispatchEvent(new Event("content:changed"));
+  warmMarkdownCache();
   render();
 });
