@@ -30,7 +30,7 @@
 
   --page-margin: 4rem;
   --nav-width: clamp(7rem, 9vw, 12rem);
-  --col-gap: clamp(1.25rem, 3vw, 3.125rem);
+  --col-gap: clamp(0.85rem, 2vw, 1.9rem);
 }
 
 /* ── 2. Reset & Base ── */
@@ -139,7 +139,7 @@ button {
 /* ── 4. Layout ── */
 .main-layout {
   display: grid;
-  grid-template-columns: var(--nav-width) 1.5fr 1.5fr;
+  grid-template-columns: var(--nav-width) 1.2fr 2.3fr;
   gap: var(--col-gap);
   align-items: start;
   width: 100%;
@@ -149,7 +149,7 @@ button {
 }
 
 .main-layout.projects-active {
-  grid-template-columns: var(--nav-width) minmax(260px, 1fr) minmax(0, 1.5fr);
+  grid-template-columns: var(--nav-width) minmax(230px, 0.86fr) minmax(0, 2.45fr);
 }
 
 /* ── 5. Navigation ── */
@@ -489,7 +489,8 @@ button {
 }
 
 .reflection-body {
-  max-width: 42rem;
+  max-width: 100%;
+  width: 100%;
 }
 
 .reflection-body h1 {
@@ -559,13 +560,13 @@ button {
 /* ── 15. Small Desktop / Tablet (901px–1500px) ── */
 @media (max-width: 1500px) and (min-width: 901px) {
   :root {
-    --col-gap: clamp(0.75rem, 1.8vw, 1.5rem);
+    --col-gap: clamp(0.6rem, 1.3vw, 1rem);
   }
 
   .main-layout.projects-active {
-    grid-template-columns: var(--nav-width) minmax(260px, 1.12fr) minmax(
+    grid-template-columns: var(--nav-width) minmax(230px, 0.9fr) minmax(
         0,
-        1.28fr
+        2.05fr
       );
   }
 
