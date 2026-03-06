@@ -21,6 +21,14 @@ window.SITE_MANIFEST = {
       meta: "10:35 — Upsilon, home",
     },
 
+    {
+      id: "Wandering-in-Time",
+      title: "Wandering in time",
+      file: "content/reflections/Wandering-in-Time.md",
+      displayDate: "31 Dec 25",
+      meta: "14:18 — McDonald’s, Atomweg, Groningen – the last day of 2025",
+    },
+
     // ── Add new reflections here ──────────────────────────
     // {
     //   id: "your-slug",
