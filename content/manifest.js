@@ -11,7 +11,6 @@
 // ============================================================
 
 window.SITE_MANIFEST = {
-
   reflections: [
     // Most recent first
     {
@@ -58,5 +57,4 @@ window.SITE_MANIFEST = {
     //   sidebarMedia: [],
     // },
   ],
-
 };
