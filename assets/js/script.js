@@ -324,6 +324,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function closeDetail() {
+    projectList &&
+      projectList.querySelectorAll(".p-title").forEach(function (b) {
+        b.classList.remove("active");
+      });
+    reflectionContainer &&
+      reflectionContainer
+        .querySelectorAll(".reflection-title")
+        .forEach(function (b) {
+          b.classList.remove("active");
+        });
     if (projectDetails) {
       projectDetails.innerHTML = "";
       projectDetails.classList.remove("visible");
@@ -341,6 +351,10 @@ document.addEventListener("DOMContentLoaded", function () {
     projectList.addEventListener("click", function (e) {
       var btn = e.target.closest(".p-title");
       if (!btn) return;
+      projectList.querySelectorAll(".p-title").forEach(function (b) {
+        b.classList.remove("active");
+      });
+      btn.classList.add("active");
       var project = projects.find(function (p) {
         return p.id === btn.dataset.id;
       });
@@ -360,6 +374,12 @@ document.addEventListener("DOMContentLoaded", function () {
     reflectionContainer.addEventListener("click", function (e) {
       var btn = e.target.closest(".reflection-title");
       if (!btn) return;
+      reflectionContainer
+        .querySelectorAll(".reflection-title")
+        .forEach(function (b) {
+          b.classList.remove("active");
+        });
+      btn.classList.add("active");
       openDetail({
         file: btn.dataset.file,
         title: btn.dataset.title,
