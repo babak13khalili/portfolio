@@ -4,63 +4,215 @@
 //  To add content, only edit that file + add a .md file.
 // ============================================================
 
-// ── Scratch Canvas ───────────────────────────────────────────
-(function initScratch() {
-  const canvas = document.getElementById("scratch-canvas");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  let painting = false;
+// ── Cursor FX (desktop pointer only) ────────────────────────
+(function initCursorFX() {
+  var supportsFinePointer = window.matchMedia(
+    "(hover: hover) and (pointer: fine)",
+  ).matches;
+  if (!supportsFinePointer) return;
 
-  function resize() {
-    const container = canvas.parentElement;
-    canvas.width = container.offsetWidth;
-    canvas.height = container.offsetHeight;
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  var cursor = document.getElementById("cursor-square");
+  if (!cursor) return;
+
+  var idleTimer = null;
+  var rafId = null;
+  var pointerX = -1000;
+  var pointerY = -1000;
+  var radius = 12;
+  var targets = [];
+  var textRootSelector = [
+    "main p",
+    "main h1",
+    "main h2",
+    "main h3",
+    "main li",
+    "main a",
+    "main button",
+    "main time",
+    "#project-details p",
+    "#project-details h1",
+    "#project-details h2",
+    "#project-details h3",
+    "#project-details li",
+    "#project-details figcaption",
+  ].join(", ");
+
+  function wrapTextFragments(root) {
+    if (!root || root.dataset.cursorGlitchWrapped === "1") return;
+
+    var nodes = [];
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        if (!node.nodeValue || !node.nodeValue.trim()) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        var parent = node.parentElement;
+        if (!parent) return NodeFilter.FILTER_REJECT;
+        if (parent.closest(".cursor-glitch-frag")) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+
+    var current;
+    while ((current = walker.nextNode())) {
+      nodes.push(current);
+    }
+
+    nodes.forEach(function (node) {
+      var text = node.nodeValue;
+      var frag = document.createDocumentFragment();
+
+      Array.from(text).forEach(function (part) {
+        if (/\s/.test(part)) {
+          frag.appendChild(document.createTextNode(part));
+        } else {
+        var span = document.createElement("span");
+        span.className = "cursor-glitch-frag";
+        span.textContent = part;
+        frag.appendChild(span);
+        }
+      });
+
+      node.parentNode.replaceChild(frag, node);
+    });
+
+    root.dataset.cursorGlitchWrapped = "1";
   }
 
-  function getPos(e) {
-    const r = canvas.getBoundingClientRect();
-    const src = e.touches ? e.touches[0] : e;
-    return { x: src.clientX - r.left, y: src.clientY - r.top };
+  function collectTargets() {
+    targets.forEach(function (el) {
+      el.classList.remove("cursor-glitch-active");
+      el.style.removeProperty("--glitch-x");
+      el.style.removeProperty("--glitch-y");
+      el.style.removeProperty("--glitch-rgb");
+      el.style.removeProperty("--glitch-amt");
+      el.style.removeProperty("--glitch-skew");
+      el.style.removeProperty("--glitch-rot");
+    });
+
+    Array.prototype.slice
+      .call(document.querySelectorAll(textRootSelector))
+      .filter(function (root) {
+        return !root.closest("#home");
+      })
+      .forEach(function (root) {
+        wrapTextFragments(root);
+      });
+
+    targets = Array.prototype.slice
+      .call(document.querySelectorAll(".cursor-glitch-frag"))
+      .filter(function (el) {
+        return !el.closest("#home");
+      });
   }
 
-  function scratch(e) {
-    if (!painting) return;
-    e.preventDefault();
-    const { x, y } = getPos(e);
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.beginPath();
-    ctx.arc(x, y, 32, 0, Math.PI * 2);
-    ctx.fill();
+  function clearTarget(el) {
+    el.classList.remove("cursor-glitch-active");
+    el.style.removeProperty("--glitch-x");
+    el.style.removeProperty("--glitch-y");
+    el.style.removeProperty("--glitch-rgb");
+    el.style.removeProperty("--glitch-amt");
+    el.style.removeProperty("--glitch-skew");
+    el.style.removeProperty("--glitch-rot");
   }
 
-  canvas.addEventListener("mousedown", function (e) {
-    painting = true;
-    scratch(e);
-  });
-  canvas.addEventListener("mousemove", scratch);
-  canvas.addEventListener("mouseup", function () {
-    painting = false;
-  });
-  canvas.addEventListener("mouseleave", function () {
-    painting = false;
-  });
-  canvas.addEventListener(
-    "touchstart",
+  function applyTarget(el, strength) {
+    var jitterX = (Math.random() - 0.5) * 14 * strength;
+    var jitterY = (Math.random() - 0.5) * 10 * strength;
+    var rgb = 0.75 + strength * 1.8;
+    var amt = 1.2 + strength * 1.1;
+    var skew = (Math.random() - 0.5) * 12 * strength;
+    var rot = (Math.random() - 0.5) * 6 * strength;
+
+    el.classList.add("cursor-glitch-active");
+    el.style.setProperty("--glitch-x", jitterX.toFixed(2) + "px");
+    el.style.setProperty("--glitch-y", jitterY.toFixed(2) + "px");
+    el.style.setProperty("--glitch-rgb", rgb.toFixed(2) + "px");
+    el.style.setProperty("--glitch-amt", amt.toFixed(2));
+    el.style.setProperty("--glitch-skew", skew.toFixed(2) + "deg");
+    el.style.setProperty("--glitch-rot", rot.toFixed(2) + "deg");
+  }
+
+  function isVisible(el) {
+    var rect = el.getBoundingClientRect();
+    return (
+      rect.bottom > 0 &&
+      rect.right > 0 &&
+      rect.left < window.innerWidth &&
+      rect.top < window.innerHeight
+    );
+  }
+
+  function nearestTargets(maxCount) {
+    var scored = [];
+    targets.forEach(function (el) {
+      if (!isVisible(el)) return;
+      var rect = el.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      var dist = distanceToRect(pointerX, pointerY, rect);
+      if (dist > radius) {
+        clearTarget(el);
+        return;
+      }
+      scored.push({ el: el, dist: dist });
+    });
+    scored.sort(function (a, b) {
+      return a.dist - b.dist;
+    });
+    return scored.slice(0, maxCount);
+  }
+
+  function distanceToRect(x, y, rect) {
+    var dx = Math.max(rect.left - x, 0, x - rect.right);
+    var dy = Math.max(rect.top - y, 0, y - rect.bottom);
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function clearGlitch() {
+    targets.forEach(clearTarget);
+  }
+
+  function renderGlitch() {
+    rafId = null;
+    var active = nearestTargets(8);
+    active.forEach(function (item) {
+      var t = 1 - item.dist / radius;
+      applyTarget(item.el, t);
+    });
+  }
+
+  function setIdle() {
+    clearGlitch();
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+  }
+
+  function queueRender() {
+    if (rafId) return;
+    rafId = requestAnimationFrame(renderGlitch);
+  }
+
+  document.addEventListener(
+    "mousemove",
     function (e) {
-      painting = true;
-      scratch(e);
+      pointerX = e.clientX;
+      pointerY = e.clientY;
+      cursor.style.transform =
+        "translate(" + (pointerX - 4) + "px," + (pointerY - 4) + "px)";
+      queueRender();
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(setIdle, 95);
     },
-    { passive: false },
+    { passive: true },
   );
-  canvas.addEventListener("touchmove", scratch, { passive: false });
-  canvas.addEventListener("touchend", function () {
-    painting = false;
-  });
 
-  window.addEventListener("resize", resize);
-  resize();
+  document.addEventListener("mouseleave", setIdle);
+  document.addEventListener("content:changed", collectTargets);
+  collectTargets();
 })();
 
 // ── Main App ─────────────────────────────────────────────────
@@ -310,6 +462,8 @@ document.addEventListener("DOMContentLoaded", function () {
           var rSection = document.getElementById("reflections");
           if (rSection) rSection.classList.add("reflection-open");
         }
+
+        document.dispatchEvent(new Event("content:changed"));
       })
       .catch(function (err) {
         var detail = err && err.message ? " (" + err.message + ")" : "";
@@ -343,6 +497,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (pSection) pSection.classList.remove("project-open");
     var rSection = document.getElementById("reflections");
     if (rSection) rSection.classList.remove("reflection-open");
+    document.dispatchEvent(new Event("content:changed"));
   }
 
   // ── Project clicks (delegated) ──────────────────────────────
@@ -394,5 +549,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  document.dispatchEvent(new Event("content:changed"));
   render();
 });
