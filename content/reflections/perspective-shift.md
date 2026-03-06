@@ -33,6 +33,3 @@ I tried, instead of anger, swearing, and harsh self-confrontation, to laugh, and
 Although the incident itself was infuriating and disappointing to me, this change of method and perspective—the attempt at a different angle compared to most of my past experiences—was very important and valuable.  
 Instead of continuing the anger and grappling with myself, I at least tried to laugh and to see the whole thing with a foolish gaze.
 It was an important and valuable step forward.
-  
-**10:35**
-**Upsilon – Home** 

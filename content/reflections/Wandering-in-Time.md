@@ -118,7 +118,3 @@ Perhaps it is a characteristic of this environment: concerns about the future ar
 I am homesick and alone.  
 A deep, inner loneliness.  
 Homesick for myself, and for the moments that passed—spent anxiously rushing toward the future without recognizing their true quality.  
- 
-
-**14:18**  
-**McDonald’s, Atomweg, Groningen – the last day of 2025**
