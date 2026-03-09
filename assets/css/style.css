@@ -149,7 +149,10 @@ button {
 }
 
 .main-layout.projects-active {
-  grid-template-columns: var(--nav-width) minmax(230px, 0.86fr) minmax(0, 2.45fr);
+  grid-template-columns: var(--nav-width) minmax(230px, 0.86fr) minmax(
+      0,
+      2.45fr
+    );
 }
 
 /* ── 5. Navigation ── */
