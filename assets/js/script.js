@@ -9,223 +9,204 @@
   var cursor = document.getElementById("cursor-square");
   if (!cursor) return;
 
+  if (
+    window.matchMedia &&
+    window.matchMedia("(pointer: coarse)").matches
+  ) {
+    return;
+  }
+
   document.documentElement.classList.add("cursor-fx-enabled");
 
-  var idleTimer = null;
-  var rafId = null;
-  var pointerX = -1000;
-  var pointerY = -1000;
-  var radius = 12;
-  var targets = [];
-
-  var textRootSelector = [
-    "main p",
-    "main h1",
-    "main h2",
-    "main h3",
-    "main li",
-    "main a",
-    "main button",
-    "main time",
-    "#project-details p",
-    "#project-details h1",
-    "#project-details h2",
-    "#project-details h3",
-    "#project-details li",
-    "#project-details figcaption",
-  ].join(", ");
-
-  function wrapTextFragments(root) {
-    if (!root || root.dataset.cursorGlitchWrapped === "1") return;
-
-    var nodes = [];
-    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-      acceptNode: function (node) {
-        if (!node.nodeValue || !node.nodeValue.trim()) {
-          return NodeFilter.FILTER_REJECT;
-        }
-
-        var parent = node.parentElement;
-        if (!parent) return NodeFilter.FILTER_REJECT;
-        if (parent.closest(".cursor-glitch-frag")) {
-          return NodeFilter.FILTER_REJECT;
-        }
-
-        return NodeFilter.FILTER_ACCEPT;
-      },
-    });
-
-    var current;
-    while ((current = walker.nextNode())) {
-      nodes.push(current);
-    }
-
-    nodes.forEach(function (node) {
-      var text = node.nodeValue;
-      var frag = document.createDocumentFragment();
-
-      Array.from(text).forEach(function (part) {
-        if (/\s/.test(part)) {
-          frag.appendChild(document.createTextNode(part));
-        } else {
-          var span = document.createElement("span");
-          span.className = "cursor-glitch-frag";
-          span.textContent = part;
-          frag.appendChild(span);
-        }
-      });
-
-      node.parentNode.replaceChild(frag, node);
-    });
-
-    root.dataset.cursorGlitchWrapped = "1";
-  }
-
-  function clearTarget(el) {
-    el.classList.remove("cursor-glitch-active");
-    el.style.removeProperty("--glitch-x");
-    el.style.removeProperty("--glitch-y");
-    el.style.removeProperty("--glitch-rgb");
-    el.style.removeProperty("--glitch-amt");
-    el.style.removeProperty("--glitch-skew");
-    el.style.removeProperty("--glitch-rot");
-  }
-
-  function collectTargets() {
-    targets.forEach(clearTarget);
-
-    Array.prototype.slice
-      .call(document.querySelectorAll(textRootSelector))
-      .filter(function (root) {
-        return !root.closest("#home");
-      })
-      .forEach(function (root) {
-        wrapTextFragments(root);
-      });
-
-    targets = Array.prototype.slice
-      .call(document.querySelectorAll(".cursor-glitch-frag"))
-      .filter(function (el) {
-        return !el.closest("#home");
-      });
-  }
-
-  function distanceToRect(x, y, rect) {
-    var dx = Math.max(rect.left - x, 0, x - rect.right);
-    var dy = Math.max(rect.top - y, 0, y - rect.bottom);
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  function isVisible(el) {
-    var rect = el.getBoundingClientRect();
-    return (
-      rect.bottom > 0 &&
-      rect.right > 0 &&
-      rect.left < window.innerWidth &&
-      rect.top < window.innerHeight
-    );
-  }
-
-  function applyTarget(el, strength) {
-    var jitterX = (Math.random() - 0.5) * 14 * strength;
-    var jitterY = (Math.random() - 0.5) * 10 * strength;
-    var rgb = 0.75 + strength * 1.8;
-    var amt = 1.2 + strength * 1.1;
-    var skew = (Math.random() - 0.5) * 12 * strength;
-    var rot = (Math.random() - 0.5) * 6 * strength;
-
-    el.classList.add("cursor-glitch-active");
-    el.style.setProperty("--glitch-x", jitterX.toFixed(2) + "px");
-    el.style.setProperty("--glitch-y", jitterY.toFixed(2) + "px");
-    el.style.setProperty("--glitch-rgb", rgb.toFixed(2) + "px");
-    el.style.setProperty("--glitch-amt", amt.toFixed(2));
-    el.style.setProperty("--glitch-skew", skew.toFixed(2) + "deg");
-    el.style.setProperty("--glitch-rot", rot.toFixed(2) + "deg");
-  }
-
-  function nearestTargets(maxCount) {
-    var scored = [];
-
-    targets.forEach(function (el) {
-      if (!isVisible(el)) return;
-
-      var rect = el.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-
-      var dist = distanceToRect(pointerX, pointerY, rect);
-      if (dist > radius) {
-        clearTarget(el);
-        return;
-      }
-
-      scored.push({ el: el, dist: dist });
-    });
-
-    scored.sort(function (a, b) {
-      return a.dist - b.dist;
-    });
-
-    return scored.slice(0, maxCount);
-  }
-
-  function clearGlitch() {
-    targets.forEach(clearTarget);
-  }
-
-  function renderGlitch() {
-    rafId = null;
-
-    var active = nearestTargets(8);
-    active.forEach(function (item) {
-      var t = 1 - item.dist / radius;
-      applyTarget(item.el, t);
-    });
-  }
-
-  function setIdle() {
-    clearGlitch();
-
-    if (rafId) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
-    }
-  }
-
-  function queueRender() {
-    if (rafId) return;
-    rafId = requestAnimationFrame(renderGlitch);
-  }
-
-  function updatePointer(x, y) {
-    pointerX = x;
-    pointerY = y;
+  function moveCursor(x, y) {
     cursor.style.transform =
-      "translate(" + (pointerX - 4) + "px," + (pointerY - 4) + "px)";
-    queueRender();
-
-    if (idleTimer) clearTimeout(idleTimer);
-    idleTimer = setTimeout(setIdle, 95);
+      "translate(" + (x - 4) + "px," + (y - 4) + "px)";
   }
 
   document.addEventListener("pointermove", function (e) {
-    updatePointer(e.clientX, e.clientY);
+    moveCursor(e.clientX, e.clientY);
   });
 
   document.addEventListener("pointerdown", function (e) {
-    updatePointer(e.clientX, e.clientY);
+    moveCursor(e.clientX, e.clientY);
   });
+})();
 
-  document.addEventListener("touchmove", function (e) {
-    if (!e.touches || !e.touches.length) return;
-    updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+// ── Text Glitch FX ───────────────────────────────────────────
+(function initTextGlitchFX() {
+  if (
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    return;
+  }
+
+  var selector = [
+    ".nav-link",
+    ".p-title",
+    ".reflection-title",
+    ".txt-h1",
+    ".txt-sub",
+    ".project-detail-title",
+    ".project-detail-description h2",
+    ".project-detail-description h3",
+    ".reflection-body h1",
+    ".reflection-body h2",
+    ".reflection-body h3",
+    ".contact-links a",
+  ].join(", ");
+
+  var pulsing = false;
+  var pointerRaf = null;
+  var pendingPointerTarget = null;
+  var displacementRaf = null;
+  var pendingDisplacementTarget = null;
+  var activeDisplacementTarget = null;
+
+  function triggerGlitch(el, duration) {
+    if (!el) return;
+
+    var now = performance.now();
+    var cooldown = Number(el.dataset.glitchCooldown || 0);
+    if (cooldown > now) return;
+
+    el.dataset.glitchCooldown = String(now + 90);
+    clearTimeout(el._glitchTimer);
+    el.classList.add("glitch-trigger");
+    el._glitchTimer = setTimeout(function () {
+      el.classList.remove("glitch-trigger");
+    }, duration || 140);
+  }
+
+  function setDisplacement(el, clientX, clientY) {
+    if (!el) return;
+
+    var rect = el.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    var relX = (clientX - rect.left) / rect.width;
+    var relY = (clientY - rect.top) / rect.height;
+    var offsetX = (relX - 0.5) * 6;
+    var offsetY = (relY - 0.5) * 4;
+
+    el.style.setProperty("--cursor-dx", offsetX.toFixed(2) + "px");
+    el.style.setProperty("--cursor-dy", offsetY.toFixed(2) + "px");
+    el.classList.add("glitch-displace");
+    activeDisplacementTarget = el;
+  }
+
+  function clearDisplacement(el) {
+    if (!el) return;
+    el.style.setProperty("--cursor-dx", "0px");
+    el.style.setProperty("--cursor-dy", "0px");
+    el.classList.remove("glitch-displace");
+    if (activeDisplacementTarget === el) activeDisplacementTarget = null;
+  }
+
+  function buildMasks(text) {
+    var fragment = document.createDocumentFragment();
+
+    for (var i = 0; i < 5; i++) {
+      var mask = document.createElement("span");
+      var inner = document.createElement("span");
+      mask.className = "glitch-mask";
+      inner.textContent = text;
+      mask.appendChild(inner);
+      fragment.appendChild(mask);
+    }
+
+    return fragment;
+  }
+
+  function enhanceElement(el) {
+    if (!el || el.dataset.glitchReady === "1") return;
+
+    var text = (el.textContent || "").replace(/\s+/g, " ").trim();
+    if (!text) return;
+
+    el.dataset.glitchReady = "1";
+    el.dataset.text = text;
+    el.classList.add("glitch-text");
+
+    var label = document.createElement("span");
+    label.className = "glitch-label";
+    label.textContent = text;
+
+    el.textContent = "";
+    el.appendChild(label);
+    el.appendChild(buildMasks(text));
+  }
+
+  function collect() {
+    Array.prototype.slice
+      .call(document.querySelectorAll(selector))
+      .forEach(enhanceElement);
+  }
+
+  function pulseRandomElement() {
+    if (pulsing) return;
+
+    var items = Array.prototype.slice.call(document.querySelectorAll(".glitch-text"));
+    if (!items.length) return;
+
+    var target = items[Math.floor(Math.random() * items.length)];
+    pulsing = true;
+    triggerGlitch(target, 180);
+
+    setTimeout(function () {
+      pulsing = false;
+    }, 220);
+  }
+
+  document.addEventListener("content:changed", collect);
+  document.addEventListener("DOMContentLoaded", collect);
+  document.addEventListener("pointermove", function (e) {
+    pendingPointerTarget = e.target.closest(".glitch-text");
+    if (pointerRaf) return;
+
+    pointerRaf = requestAnimationFrame(function () {
+      pointerRaf = null;
+      if (!pendingPointerTarget) return;
+      triggerGlitch(pendingPointerTarget, 120);
+      pendingPointerTarget = null;
+    });
+
+    pendingDisplacementTarget = {
+      el: e.target.closest(".glitch-text"),
+      x: e.clientX,
+      y: e.clientY,
+    };
+    if (displacementRaf) return;
+
+    displacementRaf = requestAnimationFrame(function () {
+      displacementRaf = null;
+
+      if (!pendingDisplacementTarget || !pendingDisplacementTarget.el) {
+        if (activeDisplacementTarget) clearDisplacement(activeDisplacementTarget);
+        pendingDisplacementTarget = null;
+        return;
+      }
+
+      if (
+        activeDisplacementTarget &&
+        activeDisplacementTarget !== pendingDisplacementTarget.el
+      ) {
+        clearDisplacement(activeDisplacementTarget);
+      }
+
+      setDisplacement(
+        pendingDisplacementTarget.el,
+        pendingDisplacementTarget.x,
+        pendingDisplacementTarget.y,
+      );
+      pendingDisplacementTarget = null;
+    });
   });
-
-  document.addEventListener("mouseleave", setIdle);
-  document.addEventListener("pointerup", setIdle);
-  document.addEventListener("pointercancel", setIdle);
-  document.addEventListener("content:changed", collectTargets);
-
-  collectTargets();
+  document.addEventListener("pointerleave", function () {
+    if (activeDisplacementTarget) clearDisplacement(activeDisplacementTarget);
+  });
+  collect();
+  setInterval(pulseRandomElement, 1800);
 })();
 
 // ── Main App ─────────────────────────────────────────────────
