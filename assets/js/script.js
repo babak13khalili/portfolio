@@ -8,6 +8,7 @@
 (function initCursorFX() {
   var cursor = document.getElementById("cursor-square");
   if (!cursor) return;
+
   document.documentElement.classList.add("cursor-fx-enabled");
 
   var idleTimer = null;
@@ -16,6 +17,7 @@
   var pointerY = -1000;
   var radius = 12;
   var targets = [];
+
   var textRootSelector = [
     "main p",
     "main h1",
@@ -42,11 +44,13 @@
         if (!node.nodeValue || !node.nodeValue.trim()) {
           return NodeFilter.FILTER_REJECT;
         }
+
         var parent = node.parentElement;
         if (!parent) return NodeFilter.FILTER_REJECT;
         if (parent.closest(".cursor-glitch-frag")) {
           return NodeFilter.FILTER_REJECT;
         }
+
         return NodeFilter.FILTER_ACCEPT;
       },
     });
@@ -64,10 +68,10 @@
         if (/\s/.test(part)) {
           frag.appendChild(document.createTextNode(part));
         } else {
-        var span = document.createElement("span");
-        span.className = "cursor-glitch-frag";
-        span.textContent = part;
-        frag.appendChild(span);
+          var span = document.createElement("span");
+          span.className = "cursor-glitch-frag";
+          span.textContent = part;
+          frag.appendChild(span);
         }
       });
 
@@ -77,16 +81,18 @@
     root.dataset.cursorGlitchWrapped = "1";
   }
 
+  function clearTarget(el) {
+    el.classList.remove("cursor-glitch-active");
+    el.style.removeProperty("--glitch-x");
+    el.style.removeProperty("--glitch-y");
+    el.style.removeProperty("--glitch-rgb");
+    el.style.removeProperty("--glitch-amt");
+    el.style.removeProperty("--glitch-skew");
+    el.style.removeProperty("--glitch-rot");
+  }
+
   function collectTargets() {
-    targets.forEach(function (el) {
-      el.classList.remove("cursor-glitch-active");
-      el.style.removeProperty("--glitch-x");
-      el.style.removeProperty("--glitch-y");
-      el.style.removeProperty("--glitch-rgb");
-      el.style.removeProperty("--glitch-amt");
-      el.style.removeProperty("--glitch-skew");
-      el.style.removeProperty("--glitch-rot");
-    });
+    targets.forEach(clearTarget);
 
     Array.prototype.slice
       .call(document.querySelectorAll(textRootSelector))
@@ -104,14 +110,20 @@
       });
   }
 
-  function clearTarget(el) {
-    el.classList.remove("cursor-glitch-active");
-    el.style.removeProperty("--glitch-x");
-    el.style.removeProperty("--glitch-y");
-    el.style.removeProperty("--glitch-rgb");
-    el.style.removeProperty("--glitch-amt");
-    el.style.removeProperty("--glitch-skew");
-    el.style.removeProperty("--glitch-rot");
+  function distanceToRect(x, y, rect) {
+    var dx = Math.max(rect.left - x, 0, x - rect.right);
+    var dy = Math.max(rect.top - y, 0, y - rect.bottom);
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function isVisible(el) {
+    var rect = el.getBoundingClientRect();
+    return (
+      rect.bottom > 0 &&
+      rect.right > 0 &&
+      rect.left < window.innerWidth &&
+      rect.top < window.innerHeight
+    );
   }
 
   function applyTarget(el, strength) {
@@ -131,39 +143,29 @@
     el.style.setProperty("--glitch-rot", rot.toFixed(2) + "deg");
   }
 
-  function isVisible(el) {
-    var rect = el.getBoundingClientRect();
-    return (
-      rect.bottom > 0 &&
-      rect.right > 0 &&
-      rect.left < window.innerWidth &&
-      rect.top < window.innerHeight
-    );
-  }
-
   function nearestTargets(maxCount) {
     var scored = [];
+
     targets.forEach(function (el) {
       if (!isVisible(el)) return;
+
       var rect = el.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
+
       var dist = distanceToRect(pointerX, pointerY, rect);
       if (dist > radius) {
         clearTarget(el);
         return;
       }
+
       scored.push({ el: el, dist: dist });
     });
+
     scored.sort(function (a, b) {
       return a.dist - b.dist;
     });
-    return scored.slice(0, maxCount);
-  }
 
-  function distanceToRect(x, y, rect) {
-    var dx = Math.max(rect.left - x, 0, x - rect.right);
-    var dy = Math.max(rect.top - y, 0, y - rect.bottom);
-    return Math.sqrt(dx * dx + dy * dy);
+    return scored.slice(0, maxCount);
   }
 
   function clearGlitch() {
@@ -172,6 +174,7 @@
 
   function renderGlitch() {
     rafId = null;
+
     var active = nearestTargets(8);
     active.forEach(function (item) {
       var t = 1 - item.dist / radius;
@@ -181,6 +184,7 @@
 
   function setIdle() {
     clearGlitch();
+
     if (rafId) {
       cancelAnimationFrame(rafId);
       rafId = null;
@@ -198,6 +202,7 @@
     cursor.style.transform =
       "translate(" + (pointerX - 4) + "px," + (pointerY - 4) + "px)";
     queueRender();
+
     if (idleTimer) clearTimeout(idleTimer);
     idleTimer = setTimeout(setIdle, 95);
   }
@@ -219,20 +224,28 @@
   document.addEventListener("pointerup", setIdle);
   document.addEventListener("pointercancel", setIdle);
   document.addEventListener("content:changed", collectTargets);
+
   collectTargets();
 })();
 
 // ── Main App ─────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", function () {
   var manifest = window.SITE_MANIFEST || { reflections: [], projects: [] };
-  var reflections = manifest.reflections;
-  var projects = manifest.projects;
+  var reflections = Array.isArray(manifest.reflections)
+    ? manifest.reflections
+    : [];
+  var projects = Array.isArray(manifest.projects) ? manifest.projects : [];
 
   var layoutRoot = document.getElementById("layout-root");
   var navLinks = document.querySelectorAll(".nav-link");
   var pages = document.querySelectorAll(".page");
   var aboutImg = document.getElementById("about-img");
   var projectDetails = document.getElementById("project-details");
+
+  var reflectionContainer = document.querySelector(".reflection-container");
+  var projectList = document.querySelector(".project-list");
+  var projectsSection = document.getElementById("projects");
+  var reflectionsSection = document.getElementById("reflections");
 
   var state = {
     activeSection: "home",
@@ -243,8 +256,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var markdownCache = Object.create(null);
 
   // ── Build lists from manifest ───────────────────────────────
-
-  var reflectionContainer = document.querySelector(".reflection-container");
   if (reflectionContainer) {
     reflectionContainer.innerHTML = reflections
       .map(function (r) {
@@ -253,7 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
           '<time class="txt-tiny">' +
           r.displayDate +
           "</time>" +
-          '<button class="reflection-title txt-h3"' +
+          '<button class="reflection-title txt-h3" type="button"' +
           ' data-id="' +
           r.id +
           '"' +
@@ -277,13 +288,12 @@ document.addEventListener("DOMContentLoaded", function () {
       .join("");
   }
 
-  var projectList = document.querySelector(".project-list");
   if (projectList) {
     projectList.innerHTML = projects
       .map(function (p) {
         return (
           "<li>" +
-          '<button class="p-title txt-h2"' +
+          '<button class="p-title txt-h2" type="button"' +
           ' data-id="' +
           p.id +
           '"' +
@@ -302,7 +312,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ── State & render ──────────────────────────────────────────
-
   function setState(patch) {
     Object.assign(state, patch);
     render();
@@ -312,22 +321,24 @@ document.addEventListener("DOMContentLoaded", function () {
     pages.forEach(function (page) {
       page.classList.toggle("active", page.id === state.activeSection);
     });
+
     navLinks.forEach(function (btn) {
       btn.classList.toggle(
         "active",
         btn.dataset.section === state.activeSection,
       );
     });
+
     if (aboutImg) {
       aboutImg.classList.toggle("visible", state.activeSection === "about");
     }
   }
 
   // ── Navigation ──────────────────────────────────────────────
-
   navLinks.forEach(function (btn) {
     btn.addEventListener("click", function () {
       closeDetail();
+
       setState({
         activeSection: btn.dataset.section,
         activeProject: null,
@@ -336,15 +347,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // ── Back button HTML helper ─────────────────────────────────
-  // btn-back is a self-contained component — use it anywhere by
-  // passing the data-back target section name.
-
+  // ── Shared UI helpers ───────────────────────────────────────
   function backButtonHTML(section) {
     return (
       '<button class="btn-back txt-tiny" data-back="' +
       section +
-      '">' +
+      '" type="button">' +
       '<span class="btn-back-arrow" aria-hidden="true">&larr;</span>' +
       '<span class="btn-back-label">Back</span>' +
       "</button>"
@@ -387,10 +395,9 @@ document.addEventListener("DOMContentLoaded", function () {
     return markdown;
   }
 
-  // ── Open detail (projects + reflections) ────────────────────
-
   function fetchMarkdown(file) {
     var cached = markdownCache[file];
+
     if (typeof cached === "string") return Promise.resolve(cached);
     if (cached && typeof cached.then === "function") return cached;
 
@@ -425,12 +432,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
     files.forEach(function (file, index) {
       var delay = index * 120;
+
       setTimeout(function () {
         fetchMarkdown(file).catch(function () {
-          // keep UI responsive even if a preload fails
+          /* no-op */
         });
       }, delay);
     });
+  }
+
+  function renderSidebarMedia(items) {
+    if (!items || !items.length) return "";
+
+    return items
+      .map(function (item) {
+        if (item.type === "video") {
+          return (
+            '<figure class="p-block p-media">' +
+            '<video controls playsinline preload="metadata"' +
+            (item.poster ? ' poster="' + item.poster + '"' : "") +
+            ">" +
+            '<source src="' +
+            item.src +
+            '" type="video/mp4">' +
+            "</video>" +
+            (item.caption
+              ? '<figcaption class="p-media-caption">' +
+                item.caption +
+                "</figcaption>"
+              : "") +
+            "</figure>"
+          );
+        }
+
+        return (
+          '<figure class="p-block p-media">' +
+          '<img src="' +
+          item.src +
+          '" alt="' +
+          (item.alt || "") +
+          '">' +
+          (item.caption
+            ? '<figcaption class="p-media-caption">' +
+              item.caption +
+              "</figcaption>"
+            : "") +
+          "</figure>"
+        );
+      })
+      .join("");
   }
 
   function openDetail(opts) {
@@ -443,33 +493,14 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(function (markdown) {
         markdown = stripDuplicateTopHeading(markdown, opts.title);
         var html = marked.parse(markdown, { breaks: true, gfm: true });
+
         var backSection = opts.type === "project" ? "projects" : "reflections";
         var bodyClass =
           opts.type === "reflection"
             ? "reflection-body"
             : "project-detail-description";
 
-        var mediaHtml = "";
-        if (opts.sidebarMedia && opts.sidebarMedia.length) {
-          mediaHtml = opts.sidebarMedia
-            .map(function (m) {
-              return (
-                '<figure class="p-block p-media">' +
-                '<img src="' +
-                m.src +
-                '" alt="' +
-                (m.alt || "") +
-                '">' +
-                (m.caption
-                  ? '<figcaption class="p-media-caption">' +
-                    m.caption +
-                    "</figcaption>"
-                  : "") +
-                "</figure>"
-              );
-            })
-            .join("");
-        }
+        var mediaHtml = renderSidebarMedia(opts.sidebarMedia);
 
         projectDetails.innerHTML =
           '<div class="project-detail-shell">' +
@@ -489,27 +520,13 @@ document.addEventListener("DOMContentLoaded", function () {
           "</div>" +
           mediaHtml;
 
-        // Attach back button click
-        var backBtn = projectDetails.querySelector(".btn-back");
-        if (backBtn) {
-          backBtn.addEventListener("click", function () {
-            var section = backBtn.dataset.back;
-            closeDetail();
-            setState({
-              activeSection: section,
-              activeProject: null,
-              activeReflection: null,
-            });
-          });
-        }
-
         if (opts.type === "project") {
           if (layoutRoot) layoutRoot.classList.add("projects-active");
-          var pSection = document.getElementById("projects");
-          if (pSection) pSection.classList.add("project-open");
+          if (projectsSection) projectsSection.classList.add("project-open");
         } else {
-          var rSection = document.getElementById("reflections");
-          if (rSection) rSection.classList.add("reflection-open");
+          if (reflectionsSection) {
+            reflectionsSection.classList.add("reflection-open");
+          }
         }
 
         document.dispatchEvent(new Event("content:changed"));
@@ -527,63 +544,77 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function closeDetail() {
-    projectList &&
-      projectList.querySelectorAll(".p-title").forEach(function (b) {
-        b.classList.remove("active");
+    if (projectList) {
+      projectList.querySelectorAll(".p-title").forEach(function (btn) {
+        btn.classList.remove("active");
       });
-    reflectionContainer &&
+    }
+
+    if (reflectionContainer) {
       reflectionContainer
         .querySelectorAll(".reflection-title")
-        .forEach(function (b) {
-          b.classList.remove("active");
+        .forEach(function (btn) {
+          btn.classList.remove("active");
         });
+    }
+
     if (projectDetails) {
       projectDetails.innerHTML = "";
       projectDetails.classList.remove("visible");
     }
+
     if (layoutRoot) layoutRoot.classList.remove("projects-active");
-    var pSection = document.getElementById("projects");
-    if (pSection) pSection.classList.remove("project-open");
-    var rSection = document.getElementById("reflections");
-    if (rSection) rSection.classList.remove("reflection-open");
+    if (projectsSection) projectsSection.classList.remove("project-open");
+    if (reflectionsSection) {
+      reflectionsSection.classList.remove("reflection-open");
+    }
+
     document.dispatchEvent(new Event("content:changed"));
   }
 
   // ── Project clicks (delegated) ──────────────────────────────
-
   if (projectList) {
     projectList.addEventListener("click", function (e) {
       var btn = e.target.closest(".p-title");
       if (!btn) return;
+
       projectList.querySelectorAll(".p-title").forEach(function (b) {
         b.classList.remove("active");
       });
       btn.classList.add("active");
+
       var project = projects.find(function (p) {
         return p.id === btn.dataset.id;
       });
+
       openDetail({
         file: btn.dataset.file,
         title: btn.dataset.title,
         type: "project",
         sidebarMedia: project ? project.sidebarMedia : [],
       });
-      setState({ activeSection: "projects", activeProject: btn.dataset.id });
+
+      setState({
+        activeSection: "projects",
+        activeProject: btn.dataset.id,
+        activeReflection: null,
+      });
     });
   }
 
   // ── Reflection clicks (delegated) ───────────────────────────
-
   if (reflectionContainer) {
     reflectionContainer.addEventListener("click", function (e) {
       var btn = e.target.closest(".reflection-title");
       if (!btn) return;
+
       reflectionContainer
         .querySelectorAll(".reflection-title")
         .forEach(function (b) {
           b.classList.remove("active");
         });
       btn.classList.add("active");
+
       openDetail({
         file: btn.dataset.file,
         title: btn.dataset.title,
@@ -591,9 +622,28 @@ document.addEventListener("DOMContentLoaded", function () {
         meta: btn.dataset.meta,
         type: "reflection",
       });
+
       setState({
         activeSection: "reflections",
         activeReflection: btn.dataset.id,
+        activeProject: null,
+      });
+    });
+  }
+
+  // ── Back button (delegated) ─────────────────────────────────
+  if (projectDetails) {
+    projectDetails.addEventListener("click", function (e) {
+      var backBtn = e.target.closest(".btn-back");
+      if (!backBtn) return;
+
+      var section = backBtn.dataset.back || "projects";
+      closeDetail();
+
+      setState({
+        activeSection: section,
+        activeProject: null,
+        activeReflection: null,
       });
     });
   }

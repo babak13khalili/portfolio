@@ -45,7 +45,7 @@ window.SITE_MANIFEST = {
       title: "Data Shredder",
       file: "content/projects/data-shredder.md",
       sidebarMedia: [
-        // { src: "assets/images/data-shredder-1.jpg", alt: "Installation view", caption: "" },
+        // { type: "image", src: "assets/images/data-shredder-1.jpg", alt: "Installation view", caption: "" },
       ],
     },
     {
@@ -53,7 +53,7 @@ window.SITE_MANIFEST = {
       title: "Disruption",
       file: "content/projects/disruption.md",
       sidebarMedia: [
-        // { src: "assets/images/disruption-1.jpg", alt: "Disruption, Tehran 2025" },
+        // { type: "image", src: "assets/images/disruption-1.jpg", alt: "Disruption, Tehran 2025" },
       ],
     },
 

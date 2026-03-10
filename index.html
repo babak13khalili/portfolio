@@ -18,25 +18,49 @@
 
   <body>
     <div class="main-layout" id="layout-root">
-
       <!-- Navigation -->
       <nav class="navbar" aria-label="Main navigation">
         <ul>
-          <li><button class="nav-link active txt-nav" data-section="home">Home</button></li>
-          <li><button class="nav-link txt-nav" data-section="about">About</button></li>
-          <li><button class="nav-link txt-nav" data-section="projects">Projects</button></li>
-          <!-- <li><button class="nav-link txt-nav" data-section="log">Log</button></li> -->
-          <li><button class="nav-link txt-nav" data-section="contact">Contact</button></li>
+          <li>
+            <button
+              class="nav-link active txt-nav"
+              data-section="home"
+              type="button">
+              Home
+            </button>
+          </li>
+          <li>
+            <button class="nav-link txt-nav" data-section="about" type="button">
+              About
+            </button>
+          </li>
+          <li>
+            <button
+              class="nav-link txt-nav"
+              data-section="projects"
+              type="button">
+              Projects
+            </button>
+          </li>
+          <!-- <li><button class="nav-link txt-nav" data-section="log" type="button">Log</button></li> -->
+          <li>
+            <button
+              class="nav-link txt-nav"
+              data-section="contact"
+              type="button">
+              Contact
+            </button>
+          </li>
         </ul>
       </nav>
 
       <!-- Main -->
       <main class="content-center">
+        <section id="home" class="page active" aria-label="Home"></section>
 
-        <section id="home" class="page active"></section>
-
-        <section id="about" class="page">
+        <section id="about" class="page" aria-label="About Babak Khalili">
           <h1 class="txt-h1">Babak Khalili</h1>
+
           <div class="bio-paragraph txt-body">
             <p>
               Babak is a multi-disciplinary artist and currently Master's
@@ -78,23 +102,38 @@
           <div class="cv-wrapper">
             <div class="cv-section">
               <h2 class="txt-sub">Education</h2>
-              <p class="txt-body">2027 — Masters of Fine Arts, MADTech, Frank Mohr Institute, Groningen, Netherlands</p>
-              <p class="txt-body">2019 — Bachelor of Visual Communication, University of Science and Culture, Tehran, Iran</p>
+              <p class="txt-body">
+                2027 — Masters of Fine Arts, MADTech, Frank Mohr Institute,
+                Groningen, Netherlands
+              </p>
+              <p class="txt-body">
+                2019 — Bachelor of Visual Communication, University of Science
+                and Culture, Tehran, Iran
+              </p>
             </div>
+
             <div class="cv-section">
               <h2 class="txt-sub">Exhibitions</h2>
-              <p class="txt-body">2025 — Video installation, Club Noord × Kunstkantine group show, Minerva Art Academy, Groningen, Netherlands</p>
-              <p class="txt-body">2025 — Disruption, Interactive solo installation, Rischee29 × Containeer, Tehran, Iran</p>
+              <p class="txt-body">
+                2025 — Video installation, Club Noord × Kunstkantine group show,
+                Minerva Art Academy, Groningen, Netherlands
+              </p>
+              <p class="txt-body">
+                2025 — Disruption, Interactive solo installation, Rischee29 ×
+                Containeer, Tehran, Iran
+              </p>
               <p class="txt-body">2025 — OOO Exhibition, Oslo, Norway</p>
               <p class="txt-body">2023 — OOO Exhibition, Oslo, Norway</p>
               <p class="txt-body">2022 — Demo Festival, Netherlands</p>
-              <p class="txt-body">2017 — Photography Group Exhibition, No.6 Gallery, Tehran, Iran</p>
+              <p class="txt-body">
+                2017 — Photography Group Exhibition, No.6 Gallery, Tehran, Iran
+              </p>
             </div>
           </div>
         </section>
 
         <!-- Projects — populated by script.js from manifest.js -->
-        <section id="projects" class="page">
+        <section id="projects" class="page" aria-label="Projects">
           <ul class="project-list"></ul>
         </section>
 
@@ -104,23 +143,25 @@
         </section>
         -->
 
-
-        <section id="contact" class="page">
+        <section id="contact" class="page" aria-label="Contact">
           <address class="contact-links txt-body">
-            <p><a href="mailto:babak313khalili@gmail.com">babak313khalili@gmail.com</a></p>
+            <p>
+              <a href="mailto:babak313khalili@gmail.com"
+                >babak313khalili@gmail.com</a
+              >
+            </p>
           </address>
         </section>
-
       </main>
 
       <!-- Sidebar -->
-      <aside class="content-right">
+      <aside class="content-right" aria-label="Details panel">
         <div id="about-img" class="side-asset">
           <img src="assets/images/profile.jpg" alt="Babak Khalili portrait" />
         </div>
-        <div id="project-details" class="side-asset"></div>
-      </aside>
 
+        <div id="project-details" class="side-asset" aria-live="polite"></div>
+      </aside>
     </div>
 
     <div id="cursor-square" aria-hidden="true"></div>
