@@ -5,32 +5,41 @@
    3. Typography
    4. Layout
    5. Navigation
-   6. Pages & Sections
+   6. Pages
    7. About
    8. Projects
-   9. Reflections
-   10. Contact
-   11. Sidebar
-   12. Back Button (btn-back)
-   13. Cursor FX
-   14. Utilities
-   15. Small Desktop / Tablet (901px–1500px)
-   16. Mobile (≤ 900px)
+   9. Contact
+   10. Cursor & Glitch FX
+   11. Home Reticle
+   12. Landmark Marks
+   13. Small screens (≤ 600px)
    ============================================================ */
 
 /* ── 1. CSS Variables ── */
 :root {
   --bg: #000;
   --text: #fff;
-  --text-inverse: #000;
   --text-dim: #666;
   --text-body: #eee;
-  --border: #333;
-  --hover-bg: #fff;
+  --border: #666;
 
-  --page-margin: 4rem;
-  --nav-width: clamp(7rem, 9vw, 12rem);
-  --col-gap: clamp(0.85rem, 2vw, 1.9rem);
+  --page-margin: clamp(1.25rem, 4vw, 2.5rem);
+  --content-max-width: 52rem;
+  --landmark-size: 0.75rem;
+  --landmark-gap-x: 0.5rem;
+  --landmark-gap-y: 0.4rem;
+
+  /* Line strokes: thin for connecting lines, thick for bracket marks. */
+  --stroke-thin: 0.4px;
+  --stroke-thick: 1px;
+
+  /* Stacking: nav sits above normal content; the reticle/landmark
+     overlays sit above nav so their lines can cross through the header;
+     the custom cursor sits above everything. */
+  --z-nav: 20;
+  --z-overlay: 25;
+  --z-cursor: 9999;
+
   --glitch-rgb-left: -0.022em;
   --glitch-rgb-right: 0.024em;
   --glitch-rgb-blur: 0.003rem;
@@ -58,12 +67,12 @@
 
 html,
 body {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   background-color: var(--bg);
   color: var(--text);
   font-family: "IBM Plex Mono", monospace;
-  font-size: 16px;
+  font-size: 15px;
+  letter-spacing: 0.01em;
 }
 
 ::selection {
@@ -93,46 +102,69 @@ button {
   cursor: pointer;
 }
 
-/* Shared interactive items */
+/* Shared interactive items — dot on hover, short line on active */
 .navbar button,
-.p-title,
-.reflection-title {
+.p-title {
+  position: relative;
   display: inline-block;
-  padding: 0.125rem 0.375rem;
+  padding: 0.15rem 0.05rem;
+  transition: color 0.15s;
+}
+
+.navbar button::after,
+.p-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.2rem;
+  width: 0.2rem;
+  height: 0.2rem;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  transform: translateX(-50%);
   transition:
-    background 0.2s,
-    color 0.2s;
+    opacity 0.15s ease,
+    width 0.18s ease,
+    height 0.18s ease,
+    border-radius 0.18s ease;
 }
 
 .navbar button.active,
 .navbar button:hover,
 .p-title.active,
-.p-title:hover,
-.reflection-title.active,
-.reflection-title:hover,
-.reflection-title:focus-visible {
-  background: var(--hover-bg);
-  color: var(--text-inverse);
+.p-title:hover {
+  color: var(--text);
   font-weight: 700;
+}
+
+/* Hover: small dot */
+.navbar button:hover::after,
+.p-title:hover::after {
+  opacity: 1;
+}
+
+/* Active: short line, grown from center */
+.navbar button.active::after,
+.p-title.active::after {
+  opacity: 1;
+  width: 0.9rem;
+  height: 2px;
+  border-radius: 999px;
 }
 
 /* ── 3. Typography ── */
 .txt-h1 {
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
   font-weight: 700;
-  line-height: 1;
-  margin-bottom: 2.5rem;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  text-align: left;
 }
 
-.txt-h2,
-.txt-h3 {
+.txt-h2 {
   font-size: clamp(1rem, 4vw, 1.4rem);
   font-weight: 400;
-  padding: 0.25rem 0.5rem;
-  display: inline-block;
-  transition:
-    background 0.2s,
-    color 0.2s;
   white-space: nowrap;
 }
 
@@ -153,7 +185,9 @@ button {
 }
 
 .txt-nav {
-  font-size: 1rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .txt-tiny {
@@ -163,47 +197,41 @@ button {
 
 /* ── 4. Layout ── */
 .main-layout {
-  display: grid;
-  grid-template-columns: var(--nav-width) 1.2fr 2.3fr;
-  gap: var(--col-gap);
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  height: 100vh;
-  padding: var(--page-margin);
+  min-height: 100vh;
   position: relative;
   z-index: 5;
-}
-
-.main-layout.projects-active {
-  grid-template-columns: var(--nav-width) minmax(230px, 0.86fr) minmax(
-      0,
-      2.45fr
-    );
 }
 
 /* ── 5. Navigation ── */
 .navbar {
   position: sticky;
   top: 0;
-  height: 100%;
-  overflow-y: auto;
-  z-index: 20;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem var(--page-margin);
+  background: var(--bg);
+  z-index: var(--z-nav);
 }
 
 .navbar ul {
   list-style: none;
-}
-
-.navbar li {
-  margin-bottom: 0.6rem;
+  display: flex;
+  gap: clamp(1.25rem, 4vw, 2.5rem);
 }
 
 /* ── 6. Pages ── */
 .content-center {
-  height: 100%;
-  overflow-y: auto;
-  padding-right: 0.5rem;
+  width: 100%;
+  max-width: var(--content-max-width);
   min-width: 0;
+  padding: 2.5rem var(--page-margin) 1rem;
+  margin: 0 auto;
+  position: relative;
 }
 
 .page {
@@ -216,17 +244,41 @@ button {
 }
 
 /* ── 7. About ── */
+.side-asset {
+  display: none;
+}
+
+#about-img.visible {
+  display: flex;
+}
+
+#about-img {
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+#about-img img {
+  width: 100%;
+  max-width: 8rem;
+  height: auto;
+}
+
 .bio-paragraph p {
   margin-bottom: 1.5rem;
   text-align: justify;
 }
 
 .cv-wrapper {
-  margin-top: 4rem;
+  margin-top: 2.25rem;
 }
 
 .cv-section {
-  margin-bottom: 3rem;
+  margin-bottom: 1.75rem;
+}
+
+.cv-section p {
+  margin-bottom: 0.9rem;
 }
 
 /* ── 8. Projects ── */
@@ -235,23 +287,58 @@ button {
 }
 
 .project-list li {
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Title (left) and close button (pushed to the far right edge of the
+   column, not just next to the title) share one row. */
+.p-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
 }
 
 .p-title {
   color: var(--text);
 }
 
+.p-close {
+  display: none;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--text-dim);
+  padding: 0.1rem 0.3rem;
+  transition: color 0.15s;
+}
+
+.p-close:hover,
+.p-close:focus-visible {
+  color: var(--text);
+}
+
+.p-title.active + .p-close {
+  display: inline-block;
+}
+
+/* Drawer: empty and collapsed until a project is opened, then expands
+   in place beneath its row, pushing later items further down. */
+.p-drawer {
+  display: none;
+}
+
+.p-drawer.open {
+  display: block;
+  margin-top: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
 .project-detail-shell {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 0.5rem;
-}
-
-.project-detail-title {
-  margin: 0;
-  font-size: clamp(2rem, 5vw, 3.25rem);
-  line-height: 1.05;
+  text-align: left;
 }
 
 .project-detail-description {
@@ -265,22 +352,79 @@ button {
   text-align: justify;
 }
 
+.project-detail-description h1 {
+  font-size: 1.8rem;
+  margin: 2rem 0 1rem 0;
+  font-weight: 700;
+}
+
+.project-detail-description h2 {
+  font-size: 1.3rem;
+  margin: 1.8rem 0 0.8rem 0;
+  font-weight: 700;
+}
+
+.project-detail-description h3 {
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0.6rem 0;
+  font-weight: 700;
+}
+
+.project-detail-description strong {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.project-detail-description em {
+  font-style: italic;
+}
+
+.project-detail-description ul,
+.project-detail-description ol {
+  margin: 1rem 0 1rem 1.2rem;
+}
+
+.project-detail-description li {
+  margin-bottom: 0.4rem;
+}
+
+.project-detail-description hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+  opacity: 0.4;
+}
+
+.project-detail-description blockquote {
+  border-left: 2px solid var(--text);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: var(--text-dim);
+}
+
+.project-detail-description code {
+  background: #111;
+  padding: 0.1rem 0.3rem;
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+
 .project-detail-layout {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 0.4rem;
+  width: 100%;
 }
 
-.project-detail-layout > .reflection-body,
 .project-detail-layout > .project-detail-description {
+  width: 100%;
+  text-align: left;
   margin-top: 1.75rem;
 }
 
-.p-block.p-text p {
-  font-size: 0.8rem;
-  line-height: 1.4;
-  color: var(--text-body);
-  text-align: justify;
+.p-block.p-media {
+  margin-bottom: 1.5rem;
 }
 
 .p-block.p-media img,
@@ -297,24 +441,11 @@ button {
   margin-top: 0.5rem;
 }
 
-/* ── 9. Reflections ── */
-.reflection-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+/* ── 9. Contact ── */
+.contact-links {
+  text-align: left;
 }
 
-.reflection-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.reflection-title {
-  align-self: flex-start;
-}
-
-/* ── 10. Contact ── */
 .contact-links p {
   margin-bottom: 0.75rem;
 }
@@ -323,82 +454,7 @@ button {
   text-decoration: underline;
 }
 
-/* ── 11. Sidebar ── */
-.content-right {
-  height: 100%;
-  overflow-y: auto;
-  width: 100%;
-  z-index: 10;
-  min-width: 0;
-}
-
-.side-asset {
-  display: none;
-}
-
-#about-img {
-  justify-content: center;
-  align-items: flex-start;
-}
-
-#about-img.visible {
-  display: flex;
-}
-
-#about-img img {
-  width: 100%;
-  max-width: 31.25rem;
-  height: auto;
-  margin: 0 auto;
-}
-
-#project-details.visible {
-  display: block;
-}
-
-.side-asset:not(#about-img) img,
-.side-asset video {
-  width: 100%;
-  max-width: 50rem;
-  height: auto;
-  border: 1px solid var(--border);
-  margin-bottom: 1.5rem;
-}
-
-/* ── 12. Back Button (btn-back) ── */
-.btn-back {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.125rem 0.375rem;
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s;
-}
-
-.btn-back:hover,
-.btn-back:focus-visible {
-  background: var(--hover-bg);
-  color: var(--text-inverse);
-}
-
-.btn-back-label,
-.btn-back-arrow {
-  position: static;
-  line-height: 1;
-  color: inherit;
-  white-space: nowrap;
-}
-
-.btn-back-arrow {
-  font-size: 1rem;
-}
-
-/* ── 13. Glitch FX ── */
+/* ── 10. Cursor & Glitch FX ── */
 .cursor-fx-enabled,
 .cursor-fx-enabled body,
 .cursor-fx-enabled body * {
@@ -409,13 +465,35 @@ button {
   position: fixed;
   top: 0;
   left: 0;
-  width: 8px;
-  height: 8px;
-  background: #fff;
+  width: 10px;
+  height: 10px;
   pointer-events: none;
-  z-index: 9999;
+  z-index: var(--z-cursor);
   mix-blend-mode: difference;
   transform: translate(-100px, -100px);
+}
+
+#cursor-square::before,
+#cursor-square::after {
+  content: "";
+  position: absolute;
+  background: #fff;
+}
+
+#cursor-square::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+#cursor-square::after {
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  transform: translateX(-50%);
 }
 
 .glitch-text {
@@ -435,7 +513,6 @@ button {
 .glitch-label {
   position: relative;
   z-index: 2;
-  transition: opacity 0.1s ease;
   transform: translate(0, 0);
   transition:
     opacity 0.1s ease,
@@ -702,212 +779,97 @@ button {
   }
 }
 
-/* ── 14. Utilities ── */
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+/* ── 11. Home Reticle ── */
+.home-reticle {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-overlay);
 }
 
-.reflection-body {
-  max-width: 100%;
+.reticle-svg {
+  display: block;
   width: 100%;
+  height: 100%;
 }
 
-.reflection-body h1 {
-  font-size: 1.8rem;
-  margin: 2rem 0 1rem 0;
-  font-weight: 700;
+.reticle-line,
+.reticle-square {
+  stroke-width: var(--stroke-thin);
+  stroke: var(--border);
 }
 
-.reflection-body h2 {
-  font-size: 1.3rem;
-  margin: 1.8rem 0 0.8rem 0;
-  font-weight: 700;
+.reticle-square {
+  fill: none;
 }
 
-.reflection-body h3 {
-  font-size: 1.1rem;
-  margin: 1.5rem 0 0.6rem 0;
-  font-weight: 700;
-}
-
-.reflection-body p {
-  margin-bottom: 1rem;
-  line-height: 1.8;
-  color: var(--text-body);
-  text-align: justify;
-}
-
-.reflection-body strong {
-  font-weight: 700;
-  color: var(--text);
-}
-
-.reflection-body em {
-  font-style: italic;
-}
-
-.reflection-body ul,
-.reflection-body ol {
-  margin: 1rem 0 1rem 1.2rem;
-}
-
-.reflection-body li {
-  margin-bottom: 0.4rem;
-}
-
-.reflection-body hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 2.5rem 0;
-  opacity: 0.4;
-}
-
-.reflection-body blockquote {
-  border-left: 2px solid var(--text);
-  padding-left: 1rem;
-  margin: 1.5rem 0;
+.reticle-coords {
+  position: absolute;
+  left: 0;
+  top: 0;
   color: var(--text-dim);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  opacity: 1;
+  font-size: 0.56rem;
 }
 
-.reflection-body code {
-  background: #111;
-  padding: 0.1rem 0.3rem;
-  border: 1px solid var(--border);
-  font-size: 0.8rem;
-}
-
-/* ── 15. Small Desktop / Tablet (901px–1500px) ── */
-@media (max-width: 1500px) and (min-width: 901px) {
-  :root {
-    --col-gap: clamp(0.6rem, 1.3vw, 1rem);
-  }
-
-  .main-layout.projects-active {
-    grid-template-columns: var(--nav-width) minmax(230px, 0.9fr) minmax(
-        0,
-        2.05fr
-      );
-  }
-
-  .project-list .p-title {
-    font-size: clamp(1.05rem, 1.2vw, 1.28rem);
-    line-height: 1.35;
-    white-space: normal;
+@media (pointer: coarse) {
+  .home-reticle {
+    display: none;
   }
 }
 
-@media (max-width: 1200px) and (min-width: 901px) {
-  .project-list .p-title {
-    font-size: clamp(0.9rem, 1vw, 1.08rem);
-  }
+/* ── 12. Landmark Marks ──
+   Brackets mark content anchors — see updateLandmarkRails() in script.js,
+   which draws the whole system into a single <svg> shared by the page, as
+   two <path> elements:
+     .landmark-line     — the connecting line for .landmark-chain groups
+                           (every member bracketed, one continuous line)
+                           and .landmark-span blocks (self-contained,
+                           bracket-line-bracket). Drawn first, so it always
+                           paints BELOW the brackets.
+     .landmark-brackets — every bracket corner mark, including collapsed
+                           .landmark-point entries (a lone opening bracket,
+                           no line) and closing end-caps. Drawn second so
+                           it paints on top.
+   Building this as one path per layer (instead of many separately
+   positioned divs/pseudo-elements) guarantees no seams between segments
+   and a fixed, correct paint order. */
+.landmark-rail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: var(--z-overlay);
 }
 
-/* ── 16. Mobile (≤ 900px) ── */
-@media (max-width: 900px) {
-  :root {
-    --page-margin: 1.5rem;
-  }
+.landmark-line {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: var(--stroke-thin);
+}
 
-  html,
-  body {
-    height: auto;
-    overflow: auto;
-  }
+.landmark-brackets {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: var(--stroke-thick);
+}
 
-  .main-layout,
-  .main-layout.projects-active {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .navbar {
-    order: 1;
-    height: auto;
-    overflow: visible;
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    padding: 0.625rem 0;
-    z-index: 100;
-  }
-
+/* ── 13. Small screens (≤ 600px) ── */
+@media (max-width: 600px) {
   .navbar ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.9375rem;
+    gap: 1.1rem;
   }
 
-  .content-right {
-    order: 2;
-    height: auto;
-    overflow: visible;
-    position: relative;
-    top: 0;
-  }
-
-  main.content-center {
-    order: 3;
-    height: auto;
-    overflow: visible;
-  }
-
-  .main-layout.projects-active main.content-center {
-    order: 2;
-  }
-
-  .main-layout.projects-active .content-right {
-    order: 3;
-  }
-
-  .main-layout.projects-active {
-    gap: 0.75rem;
-  }
-
-  .main-layout.projects-active .project-detail-shell {
-    gap: 0.3125rem;
-  }
-
-  #projects.project-open .project-list {
-    display: none;
-  }
-
-  #reflections.reflection-open .reflection-container {
-    display: none;
-  }
-
-  #about-img.visible {
-    display: block;
-    margin-bottom: 0.5rem;
+  .txt-nav {
+    font-size: 0.875rem;
   }
 
   #about-img img {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border: 1px solid var(--border);
-  }
-
-  .txt-h1 {
-    font-size: 2.2rem;
-    margin-top: 0.5rem;
-  }
-
-  .txt-h2,
-  .txt-h3,
-  .p-title,
-  .reflection-title {
-    white-space: normal;
-  }
-
-  .project-detail-title {
-    font-size: clamp(1.4rem, 7vw, 2rem);
+    max-width: 6rem;
   }
 }
 

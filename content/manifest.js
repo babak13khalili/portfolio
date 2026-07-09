@@ -1,59 +1,109 @@
 // ============================================================
 //  CONTENT MANIFEST — your only editorial interface
 //
-//  To add a new reflection:
-//    1. Create  content/reflections/your-slug.md
-//    2. Add one object to the reflections array below
-//
 //  To add a new project:
 //    1. Create  content/projects/your-slug.md
 //    2. Add one object to the projects array below
+//
+//  NOTE: sidebarMedia below is currently filled with placeholder
+//  images/videos (assets/images/placeholder-*.svg) so the page layout
+//  can be previewed before real photos/video are ready. Swap the src
+//  (and poster, for video) for the real files when available, or clear
+//  the array back to [] to show no media.
 // ============================================================
 
 window.SITE_MANIFEST = {
-  reflections: [
-    // Most recent first
-    {
-      id: "perspective-shift",
-      title: "Perspective Shift",
-      file: "content/reflections/perspective-shift.md",
-      displayDate: "9 Feb 26",
-      meta: "10:35 — Upsilon, home",
-    },
-
-    {
-      id: "Wandering-in-Time",
-      title: "Wandering in time",
-      file: "content/reflections/Wandering-in-Time.md",
-      displayDate: "31 Dec 25",
-      meta: "14:18 — McDonald’s, Atomweg, Groningen – the last day of 2025",
-    },
-
-    // ── Add new reflections here ──────────────────────────
-    // {
-    //   id: "your-slug",
-    //   title: "Your Title",
-    //   file: "content/reflections/your-slug.md",
-    //   displayDate: "5 Mar 26",
-    //   meta: "14:00 — location",
-    // },
-  ],
-
   projects: [
     {
-      id: "data-shredder",
-      title: "Data Shredder",
-      file: "content/projects/data-shredder.md",
+      id: "date-of-performance",
+      title: "Date of Performance",
+      file: "content/projects/date-of-performance.md",
       sidebarMedia: [
-        // { type: "image", src: "assets/images/data-shredder-1.jpg", alt: "Installation view", caption: "" },
+        {
+          type: "video",
+          src: "assets/videos/date-of-performance-1.mp4",
+          poster: "assets/images/placeholder-21x9.svg",
+          caption: "Documentation still, live performance, 2025.",
+        },
       ],
     },
     {
-      id: "disruption",
-      title: "Disruption",
-      file: "content/projects/disruption.md",
+      id: "latency-of-memory",
+      title: "Latency of Memory",
+      file: "content/projects/latency-of-memory.md",
       sidebarMedia: [
-        // { type: "image", src: "assets/images/disruption-1.jpg", alt: "Disruption, Tehran 2025" },
+        {
+          type: "image",
+          src: "assets/images/placeholder-16x9.svg",
+          alt: "Latency of Memory, installation view",
+          caption: "Installation view, 2025.",
+        },
+      ],
+    },
+    {
+      id: "self-portraits",
+      title: "Self Portraits",
+      file: "content/projects/self-portraits.md",
+      sidebarMedia: [
+        {
+          type: "image",
+          src: "assets/images/placeholder-4x5.svg",
+          alt: "Self Portraits, sitting one",
+        },
+        {
+          type: "image",
+          src: "assets/images/placeholder-4x5.svg",
+          alt: "Self Portraits, sitting two",
+          caption: "From the second sitting, 2024.",
+        },
+      ],
+    },
+    {
+      id: "adam-collective",
+      title: "Adam Collective",
+      file: "content/projects/adam-collective.md",
+      sidebarMedia: [
+        {
+          type: "video",
+          src: "assets/videos/adam-collective-1.mp4",
+          poster: "assets/images/placeholder-1x1.svg",
+        },
+        {
+          type: "image",
+          src: "assets/images/placeholder-16x9.svg",
+          alt: "Adam Collective, group session",
+          caption: "Working session, Groningen.",
+        },
+      ],
+    },
+    {
+      id: "wanderings",
+      title: "Wanderings",
+      file: "content/projects/wanderings.md",
+      sidebarMedia: [
+        {
+          type: "image",
+          src: "assets/images/placeholder-4x5.svg",
+          alt: "Wanderings, still one",
+        },
+      ],
+    },
+    {
+      id: "motion-design-projects",
+      title: "Motion Design Projects",
+      file: "content/projects/motion-design-projects.md",
+      sidebarMedia: [
+        {
+          type: "video",
+          src: "assets/videos/motion-reel-1.mp4",
+          poster: "assets/images/placeholder-21x9.svg",
+          caption: "Reel excerpt, identity work.",
+        },
+        {
+          type: "video",
+          src: "assets/videos/motion-reel-2.mp4",
+          poster: "assets/images/placeholder-1x1.svg",
+        },
       ],
     },
 
