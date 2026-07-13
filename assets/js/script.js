@@ -517,9 +517,6 @@ document.addEventListener("DOMContentLoaded", function () {
           '<li class="landmark-point">' +
           '<div class="p-row">' +
           '<button class="p-title txt-h2" type="button"' +
-          ' data-id="' +
-          p.id +
-          '"' +
           ' data-file="' +
           p.file +
           '"' +
@@ -654,36 +651,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function mediaCaptionHTML(caption) {
-    return caption
-      ? '<figcaption class="p-media-caption">' + caption + "</figcaption>"
-      : "";
-  }
-
-  function renderSidebarMedia(items) {
-    if (!items || !items.length) return "";
-
-    return items
-      .map(function (item) {
-        var inner =
-          item.type === "video"
-            ? '<video controls playsinline preload="metadata"' +
-              (item.poster ? ' poster="' + item.poster + '"' : "") +
-              '><source src="' +
-              item.src +
-              '" type="video/mp4"></video>'
-            : '<img src="' + item.src + '" alt="' + (item.alt || "") + '">';
-
-        return (
-          '<figure class="p-block p-media">' +
-          inner +
-          mediaCaptionHTML(item.caption) +
-          "</figure>"
-        );
-      })
-      .join("");
-  }
-
   // Bumped on every open/close so a slow, superseded fetch can't clobber
   // whatever the user has since navigated to (rapid project switching).
   var detailRequestId = 0;
@@ -708,8 +675,6 @@ document.addEventListener("DOMContentLoaded", function () {
         markdown = stripDuplicateTopHeading(markdown, opts.title);
         var html = marked.parse(markdown, { breaks: true, gfm: true });
 
-        var mediaHtml = renderSidebarMedia(opts.sidebarMedia);
-
         drawer.innerHTML =
           '<div class="project-detail-shell">' +
           '<div class="project-detail-layout">' +
@@ -719,8 +684,7 @@ document.addEventListener("DOMContentLoaded", function () {
           "</div>" +
           (opts.meta ? '<p class="txt-tiny">' + opts.meta + "</p>" : "") +
           "</div>" +
-          "</div>" +
-          mediaHtml;
+          "</div>";
 
         document.dispatchEvent(new Event("content:changed"));
 
@@ -793,14 +757,9 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.classList.add("active");
         openLi = li;
 
-        var project = projects.find(function (p) {
-          return p.id === btn.dataset.id;
-        });
-
         openDetail(li, {
           file: btn.dataset.file,
           title: btn.dataset.title,
-          sidebarMedia: project ? project.sidebarMedia : [],
         });
       }
 

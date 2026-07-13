@@ -437,24 +437,6 @@ button {
   margin-top: 1.75rem;
 }
 
-.p-block.p-media {
-  margin-bottom: 1.5rem;
-}
-
-.p-block.p-media img,
-.p-block.p-media video {
-  width: 100%;
-  height: auto;
-  border: 1px solid var(--border);
-  display: block;
-}
-
-.p-media-caption {
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  margin-top: 0.5rem;
-}
-
 /* ── 9. Contact ── */
 .contact-links {
   text-align: left;
