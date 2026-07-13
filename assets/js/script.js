@@ -9,18 +9,18 @@
   var cursor = document.getElementById("cursor-square");
   if (!cursor) return;
 
-  if (
-    window.matchMedia &&
-    window.matchMedia("(pointer: coarse)").matches
-  ) {
-    return;
-  }
+  var isCoarse =
+    window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
 
   document.documentElement.classList.add("cursor-fx-enabled");
 
   function moveCursor(x, y) {
     cursor.style.transform =
       "translate(" + (x - 5) + "px," + (y - 5) + "px)";
+  }
+
+  function hideCursor() {
+    cursor.style.transform = "translate(-100px, -100px)";
   }
 
   document.addEventListener("pointermove", function (e) {
@@ -30,6 +30,15 @@
   document.addEventListener("pointerdown", function (e) {
     moveCursor(e.clientX, e.clientY);
   });
+
+  if (isCoarse) {
+    document.addEventListener("pointerup", function (e) {
+      if (e.pointerType === "touch") hideCursor();
+    });
+    document.addEventListener("pointercancel", function (e) {
+      if (e.pointerType === "touch") hideCursor();
+    });
+  }
 })();
 
 // ── Home Reticle FX ──────────────────────────────────────────
@@ -37,12 +46,8 @@
   var wrap = document.querySelector(".home-reticle");
   if (!wrap) return;
 
-  if (
-    window.matchMedia &&
-    window.matchMedia("(pointer: coarse)").matches
-  ) {
-    return;
-  }
+  var isCoarse =
+    window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
 
   var square = wrap.querySelector(".reticle-square");
   var coords = wrap.querySelector(".reticle-coords");
@@ -106,7 +111,25 @@
     });
   });
 
-  update(window.innerWidth / 2, window.innerHeight / 2);
+  if (isCoarse) {
+    wrap.classList.add("reticle-touch");
+
+    document.addEventListener("pointerdown", function (e) {
+      if (e.pointerType !== "touch") return;
+      update(e.clientX, e.clientY);
+      wrap.classList.add("reticle-visible");
+    });
+
+    document.addEventListener("pointerup", function (e) {
+      if (e.pointerType === "touch") wrap.classList.remove("reticle-visible");
+    });
+
+    document.addEventListener("pointercancel", function (e) {
+      if (e.pointerType === "touch") wrap.classList.remove("reticle-visible");
+    });
+  } else {
+    update(window.innerWidth / 2, window.innerHeight / 2);
+  }
 })();
 
 // ── Text Glitch FX ───────────────────────────────────────────
@@ -321,10 +344,16 @@ document.addEventListener("DOMContentLoaded", function () {
     return px;
   }
 
-  var landmarkSizePx = measureCssLength("--landmark-size");
-  var landmarkGapYPx = measureCssLength("--landmark-gap-y");
-  var landmarkGapXPx = measureCssLength("--landmark-gap-x");
-  var pageMarginPx = measureCssLength("--page-margin");
+  var landmarkSizePx, landmarkGapYPx, landmarkGapXPx, pageMarginPx;
+
+  function measureLandmarkMetrics() {
+    landmarkSizePx = measureCssLength("--landmark-size");
+    landmarkGapYPx = measureCssLength("--landmark-gap-y");
+    landmarkGapXPx = measureCssLength("--landmark-gap-x");
+    pageMarginPx = measureCssLength("--page-margin");
+  }
+
+  measureLandmarkMetrics();
 
   function updateLandmarkRails() {
     var rail = document.querySelector(".landmark-rail");
@@ -461,6 +490,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (landmarkResizeRaf) return;
     landmarkResizeRaf = requestAnimationFrame(function () {
       landmarkResizeRaf = null;
+      measureLandmarkMetrics();
       updateLandmarkRails();
     });
   });

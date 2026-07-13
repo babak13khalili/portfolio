@@ -18,14 +18,7 @@ window.SITE_MANIFEST = {
       id: "date-of-performance",
       title: "Date of Performance",
       file: "content/projects/date-of-performance.md",
-      sidebarMedia: [
-        {
-          type: "video",
-          src: "assets/videos/date-of-performance-1.mp4",
-          poster: "assets/images/placeholder-21x9.svg",
-          caption: "Documentation still, live performance, 2025.",
-        },
-      ],
+      sidebarMedia: [],
     },
     {
       id: "latency-of-memory",
@@ -64,11 +57,6 @@ window.SITE_MANIFEST = {
       file: "content/projects/adam-collective.md",
       sidebarMedia: [
         {
-          type: "video",
-          src: "assets/videos/adam-collective-1.mp4",
-          poster: "assets/images/placeholder-1x1.svg",
-        },
-        {
           type: "image",
           src: "assets/images/placeholder-16x9.svg",
           alt: "Adam Collective, group session",
@@ -92,19 +80,7 @@ window.SITE_MANIFEST = {
       id: "motion-design-projects",
       title: "Motion Design Projects",
       file: "content/projects/motion-design-projects.md",
-      sidebarMedia: [
-        {
-          type: "video",
-          src: "assets/videos/motion-reel-1.mp4",
-          poster: "assets/images/placeholder-21x9.svg",
-          caption: "Reel excerpt, identity work.",
-        },
-        {
-          type: "video",
-          src: "assets/videos/motion-reel-2.mp4",
-          poster: "assets/images/placeholder-1x1.svg",
-        },
-      ],
+      sidebarMedia: [],
     },
 
     // ── Add new projects here ─────────────────────────────
