@@ -23,20 +23,27 @@
     cursor.style.transform = "translate(-100px, -100px)";
   }
 
-  document.addEventListener("pointermove", function (e) {
-    moveCursor(e.clientX, e.clientY);
-  });
-
-  document.addEventListener("pointerdown", function (e) {
-    moveCursor(e.clientX, e.clientY);
-  });
-
   if (isCoarse) {
-    document.addEventListener("pointerup", function (e) {
-      if (e.pointerType === "touch") hideCursor();
+    // Raw touch events (not Pointer Events) keep firing for the whole
+    // gesture even once the browser treats it as a scroll — Pointer Events
+    // get cancelled the moment that happens, which would hide the cursor
+    // mid-scroll.
+    function touchMoveHandler(e) {
+      var t = e.touches[0];
+      if (t) moveCursor(t.clientX, t.clientY);
+    }
+
+    document.addEventListener("touchstart", touchMoveHandler, { passive: true });
+    document.addEventListener("touchmove", touchMoveHandler, { passive: true });
+    document.addEventListener("touchend", hideCursor, { passive: true });
+    document.addEventListener("touchcancel", hideCursor, { passive: true });
+  } else {
+    document.addEventListener("pointermove", function (e) {
+      moveCursor(e.clientX, e.clientY);
     });
-    document.addEventListener("pointercancel", function (e) {
-      if (e.pointerType === "touch") hideCursor();
+
+    document.addEventListener("pointerdown", function (e) {
+      moveCursor(e.clientX, e.clientY);
     });
   }
 })();
@@ -101,33 +108,49 @@
     coords.textContent = Math.round(x) + "," + Math.round(y);
   }
 
-  document.addEventListener("pointermove", function (e) {
-    pending = { x: e.clientX, y: e.clientY };
+  function queueUpdate(x, y) {
+    pending = { x: x, y: y };
     if (raf) return;
 
     raf = requestAnimationFrame(function () {
       raf = null;
       if (pending) update(pending.x, pending.y);
     });
-  });
+  }
 
   if (isCoarse) {
     wrap.classList.add("reticle-touch");
 
-    document.addEventListener("pointerdown", function (e) {
-      if (e.pointerType !== "touch") return;
-      update(e.clientX, e.clientY);
+    // Raw touch events (not Pointer Events) keep firing for the whole
+    // gesture even once the browser treats it as a scroll — Pointer Events
+    // get cancelled the moment that happens, which would hide the reticle
+    // mid-scroll instead of letting it track the finger the whole time.
+    function touchMoveHandler(e) {
+      var t = e.touches[0];
+      if (t) queueUpdate(t.clientX, t.clientY);
+    }
+
+    document.addEventListener("touchstart", function (e) {
+      var t = e.touches[0];
+      if (!t) return;
+      update(t.clientX, t.clientY);
       wrap.classList.add("reticle-visible");
-    });
+    }, { passive: true });
 
-    document.addEventListener("pointerup", function (e) {
-      if (e.pointerType === "touch") wrap.classList.remove("reticle-visible");
-    });
+    document.addEventListener("touchmove", touchMoveHandler, { passive: true });
 
-    document.addEventListener("pointercancel", function (e) {
-      if (e.pointerType === "touch") wrap.classList.remove("reticle-visible");
-    });
+    document.addEventListener("touchend", function () {
+      wrap.classList.remove("reticle-visible");
+    }, { passive: true });
+
+    document.addEventListener("touchcancel", function () {
+      wrap.classList.remove("reticle-visible");
+    }, { passive: true });
   } else {
+    document.addEventListener("pointermove", function (e) {
+      queueUpdate(e.clientX, e.clientY);
+    });
+
     update(window.innerWidth / 2, window.innerHeight / 2);
   }
 })();
