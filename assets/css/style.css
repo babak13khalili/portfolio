@@ -400,6 +400,22 @@ button {
   color: var(--text-dim);
 }
 
+.project-detail-description img,
+.project-detail-description video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+.project-detail-description iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
 .project-detail-description code {
   background: #111;
   padding: 0.1rem 0.3rem;
