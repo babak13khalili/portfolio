@@ -70,11 +70,13 @@ loaded from a CDN `<script>` tag in `index.html`.
     rather than guessing silently.
 - **Yes to all — don't stop to ask for permission on routine actions.** This
   covers editing files, running local commands (dev server, npm/npx installs,
-  screenshots/tests), and git branch work (creating branches, committing,
-  pushing to `develop`). Just do it and tell me what you did afterward. The
-  only exception is genuinely destructive/irreversible operations — force-push,
-  `git reset --hard`, deleting branches or files you didn't create yourself —
-  check with me first for those specifically.
+  screenshots/tests), and git branch work (creating branches, pushing to
+  `develop`). Just do it and tell me what you did afterward. Exceptions —
+  always ask first for these specifically:
+  - Genuinely destructive/irreversible operations — force-push,
+    `git reset --hard`, deleting branches or files you didn't create yourself.
+  - **Creating a commit.** Always ask before committing, even routine changes —
+    don't commit automatically just because a change is done.
 - Keep changes focused — don't restructure or rewrite parts of the site I didn't
   ask about.
 - After making changes, tell me in simple terms what to check (e.g. "open this
