@@ -15,11 +15,14 @@ I am not a developer, so before making changes:
    remember it next time.
 
 ## Commands
-This is a plain HTML/CSS/JS site — no framework, no build step, no
-package.json. The only third-party code is the `marked` Markdown parser,
-loaded from a CDN `<script>` tag in `index.html`.
+This is a plain HTML/CSS/JS site — no framework, no build step. The only
+third-party code the site itself loads is the `marked` Markdown parser, via a
+CDN `<script>` tag in `index.html`. There's also a `package.json` in the repo
+root, but it's dev-only tooling (Playwright, for local screenshot/testing) —
+it has nothing to do with running or building the site itself.
 
-- **Install dependencies:** None — there is no package manager in use.
+- **Install dependencies:** None needed to run the site. `npm install` only
+  matters if you want the Playwright testing tool available.
 - **Build:** None — there is no build/compile step. Edit the files directly
   and they're ready to deploy as-is.
 - **Dev/preview:** Content (project text) is loaded at runtime
