@@ -230,6 +230,9 @@ button {
   padding: 2.5rem var(--page-margin) 1rem;
   margin: 0 auto;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .page {
@@ -242,12 +245,14 @@ button {
 }
 
 /* Home is a single centered statement while the site is under
-   construction — flex-centered instead of the default block flow. */
+   construction. .content-center already fills the space below the
+   sticky nav (flex: 1 above), so growing to fill that and centering
+   here lands on the true middle of the viewport, not a guessed height. */
 #home.page.active {
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
 }
 
 .home-message {
