@@ -241,6 +241,20 @@ button {
   display: block;
 }
 
+/* Home is a single centered statement while the site is under
+   construction — flex-centered instead of the default block flow. */
+#home.page.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.home-message {
+  text-align: center;
+  margin-bottom: 0;
+}
+
 /* ── 7. About ── */
 .side-asset {
   display: none;
